@@ -1,0 +1,12 @@
+{
+  "name": "build-slides",
+  "version": "1.0.0",
+  "description": "Generate professional presentation slides with structured formats, consistent themes, and data visualizations",
+  "instructions": "# Build Slides Skill\n\nGenerate professional presentation slides with structured formats, consistent themes, and data visualizations.\n\n## Workflow\n\n1. **Understand Requirements**\n   - Parse user request for topic, slide count, format preferences\n   - Identify target audience and presentation context\n   - Determine if charts/visualizations are needed\n\n2. **Select Format**\n   - Choose from 12 predefined slide formats\n   - Match format to content type (pitch, tutorial, report, etc.)\n   - Apply consistent structure across deck\n\n3. **Apply Theme**\n   - Select from 3 available themes\n   - Apply typography scale and color palette\n   - Ensure visual hierarchy and readability\n\n4. **Generate Content**\n   - Create slide-by-slide content following format templates\n   - Write clear, concise copy optimized for presentations\n   - Include speaker notes where appropriate\n\n5. **Add Visualizations**\n   - Implement charts using Chart.js patterns\n   - Choose appropriate chart type for data\n   - Apply theme colors to visualizations\n\n## Architecture Rules\n\n- One slide per output block\n- Use HTML/CSS for slide structure\n- Embed Chart.js for data visualizations\n- Self-contained: no external dependencies\n- Mobile-responsive layouts\n\n## QA Checklist\n\nBefore delivering slides, verify:\n\n- [ ] All slides follow selected format template\n- [ ] Theme is applied consistently across deck\n- [ ] Typography scale is respected\n- [ ] Charts render correctly with sample data\n- [ ] Slide count matches user request\n- [ ] No lorem ipsum or placeholder text\n- [ ] Speaker notes included where needed\n- [ ] Responsive layout works on mobile\n- [ ] No broken references or missing assets",
+  "metadata": {
+    "author": "agent-skills",
+    "tags": ["presentation", "slides", "generation", "design", "charts"],
+    "runtime": ["claude.ai", "claude-code", "cowork"],
+    "dependencies": ["Chart.js (CDN)"]
+  }
+}

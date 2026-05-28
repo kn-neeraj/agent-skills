@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "skills": [
+    {
+      "name": "build-slides",
+      "description": "Generate presentation slides with structured formats, themes, and chart patterns",
+      "trigger": "create slides, make presentation, build deck, generate slides, powerpoint, keynote",
+      "path": "./build-slides",
+      "tags": ["presentation", "slides", "generation", "design"],
+      "runtimes": {
+        "claude_ai": true,
+        "claude_code": true,
+        "cowork": true
+      },
+      "version": "1.0.0",
+      "author": "agent-skills"
+    }
+  ]
+}
