@@ -134,6 +134,11 @@ Generate professional presentation slides with golden ratio typography, visual c
    - Apply components.md layout for each structure
    - Apply styles.md quality systems (typography, spacing, alignment, colors)
    - Include navigation, keyboard support, speaker notes
+   - Include theme system JavaScript (THEMES constant, applyTheme function)
+   - Include theme switcher overlay HTML
+   - Include theme switcher CSS
+   - Add theme button to navigation bar
+   - Call initThemeSystem() in init()
 
 6. **Add Visualizations**
    - Implement charts using Chart.js patterns (see assets/chart-patterns.md)

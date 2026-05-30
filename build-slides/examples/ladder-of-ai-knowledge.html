@@ -17,7 +17,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ladder of AI Knowledge</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* ========== Golden Ratio Typography System ========== */
@@ -63,6 +63,109 @@
       /* Fonts */
       --font-heading: 'Bricolage Grotesque', -apple-system, sans-serif;
       --font-body: 'Inter', -apple-system, sans-serif;
+    }
+
+    /* ========== Theme Switcher ========== */
+    .theme-switcher {
+      position: fixed;
+      right: -360px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 360px;
+      max-height: 90vh;
+      background: var(--surface);
+      border: 1px solid #e2e8f0;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      padding: var(--space-5);
+      box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+      z-index: 1000;
+      transition: right 300ms ease;
+      overflow-y: auto;
+    }
+
+    .theme-switcher.visible {
+      right: 0;
+    }
+
+    .theme-switcher h3 {
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      color: var(--primary);
+      margin-bottom: var(--space-4);
+      font-weight: 700;
+    }
+
+    .theme-cards {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .theme-card {
+      padding: var(--space-4);
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 300ms ease;
+      background: white;
+    }
+
+    .theme-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-2px);
+    }
+
+    .theme-card.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .theme-card-name {
+      font-weight: 600;
+      font-size: var(--text-base);
+      margin-bottom: var(--space-2);
+    }
+
+    .theme-card.active .theme-card-name {
+      color: white;
+    }
+
+    .theme-colors {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .color-swatch {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .theme-description {
+      font-size: var(--text-xs);
+      color: var(--text-light);
+      line-height: 1.4;
+    }
+
+    .theme-card.active .theme-description {
+      color: rgba(255,255,255,0.9);
+    }
+
+    .theme-hint {
+      margin-top: var(--space-5);
+      padding: var(--space-3);
+      background: #f8fafc;
+      border-radius: var(--radius);
+      font-size: var(--text-xs);
+      color: var(--text-light);
+      line-height: 1.5;
+      border-left: 3px solid var(--primary);
     }
 
     /* ========== Global Styles ========== */
@@ -679,6 +782,7 @@
       <progress id="progressBar" value="1" max="11"></progress>
     </div>
     <button class="nav-toggle" id="notesToggle">Notes</button>
+    <button class="nav-toggle" id="themeToggle">Theme</button>
     <button class="nav-button" id="nextBtn">Next →</button>
   </div>
 
@@ -688,7 +792,132 @@
     <p id="notesContent"></p>
   </div>
 
+  <!-- Theme Switcher -->
+  <div class="theme-switcher" id="themeSwitcher">
+    <h3>Choose Theme</h3>
+    <div class="theme-cards" id="themeCards"></div>
+    <div class="theme-hint">
+      <strong>Keyboard:</strong> Shift+Tab to open, Tab to cycle, Enter to apply
+    </div>
+  </div>
+
   <script>
+    // ========== Theme System ==========
+    const THEMES = {
+      darkGraphite: {
+        name: 'Dark Graphite',
+        description: 'Professional dark theme with cool accents',
+        colors: {
+          '--primary': '#3b82f6',
+          '--secondary': '#a1a1a1',
+          '--accent': '#60a5fa',
+          '--background': '#1a1a1a',
+          '--surface': '#262626',
+          '--text': '#e5e5e5',
+          '--text-light': '#a1a1a1'
+        },
+        fonts: {
+          '--font-heading': "'Space Grotesk', sans-serif",
+          '--font-body': "'Inter', sans-serif"
+        },
+        radius: '--radius: 8px'
+      },
+      solaceMist: {
+        name: 'Solace Mist',
+        description: 'Soft, warm neutrals with elegant serif headings',
+        colors: {
+          '--primary': '#8b7355',
+          '--secondary': '#9a8d7f',
+          '--accent': '#d4a574',
+          '--background': '#faf8f6',
+          '--surface': '#f0ebe5',
+          '--text': '#4a4a4a',
+          '--text-light': '#7a7a7a'
+        },
+        fonts: {
+          '--font-heading': "'Playfair Display', serif",
+          '--font-body': "'Montserrat', sans-serif"
+        },
+        radius: '--radius: 4px'
+      },
+      highContrast: {
+        name: 'High Contrast',
+        description: 'Bold design with striking color separation',
+        colors: {
+          '--primary': '#dc2626',
+          '--secondary': '#171717',
+          '--accent': '#f59e0b',
+          '--background': '#fafafa',
+          '--surface': '#262626',
+          '--text': '#171717',
+          '--text-light': '#737373'
+        },
+        fonts: {
+          '--font-heading': "'Space Grotesk', sans-serif",
+          '--font-body': "'Inter', sans-serif"
+        },
+        radius: '--radius: 8px'
+      }
+    };
+
+    function applyTheme(themeId) {
+      const theme = THEMES[themeId];
+      if (!theme) return;
+
+      const root = document.documentElement;
+
+      // Apply colors
+      Object.entries(theme.colors).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+      });
+
+      // Apply fonts
+      Object.entries(theme.fonts).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+      });
+
+      // Save to localStorage
+      localStorage.setItem('leaf.selectedThemeID', themeId);
+      updateThemeUI(themeId);
+    }
+
+    function updateThemeUI(activeThemeId) {
+      document.querySelectorAll('.theme-card').forEach(card => {
+        const themeId = card.dataset.themeId;
+        card.classList.toggle('active', themeId === activeThemeId);
+      });
+    }
+
+    function getThemeColorSwatches(themeId) {
+      const theme = THEMES[themeId];
+      const colors = Object.values(theme.colors);
+      return colors.slice(0, 4);
+    }
+
+    function initThemeSystem() {
+      // Create theme cards
+      const themeCards = document.getElementById('themeCards');
+      Object.entries(THEMES).forEach(([themeId, theme]) => {
+        const colors = getThemeColorSwatches(themeId);
+        const card = document.createElement('div');
+        card.className = 'theme-card';
+        card.dataset.themeId = themeId;
+        card.innerHTML = `
+          <div class="theme-card-name">${theme.name}</div>
+          <div class="theme-colors">
+            ${colors.map(color => `<div class="color-swatch" style="background: ${color}"></div>`).join('')}
+          </div>
+          <div class="theme-description">${theme.description}</div>
+        `;
+        card.addEventListener('click', () => applyTheme(themeId));
+        themeCards.appendChild(card);
+      });
+
+      // Load saved theme or default
+      const savedThemeId = localStorage.getItem('leaf.selectedThemeID') || 'darkGraphite';
+      applyTheme(savedThemeId);
+    }
+
     // Presentation data
     const slides = [
       { title: "Ladder of AI Knowledge", notes: "Welcome. Today we're exploring the complete AI knowledge ladder — a framework for understanding how different areas of AI expertise build on and depend on each other." },
@@ -706,11 +935,69 @@
 
     let currentIndex = 0;
 
+    let themeListOpen = false;
+    const themeIds = Object.keys(THEMES);
+    let themeListIndex = 0;
+
     // Initialize
     function init() {
       document.getElementById("totalSlides").textContent = slides.length;
+      initThemeSystem();
       updateSlide();
       setupChart();
+      setupThemeControls();
+    }
+
+    function setupThemeControls() {
+      const themeToggle = document.getElementById('themeToggle');
+      const themeSwitcher = document.getElementById('themeSwitcher');
+
+      themeToggle.addEventListener('click', () => toggleThemeSwitcher());
+
+      document.addEventListener('keydown', (e) => {
+        if (e.shiftKey && e.key === 'Tab') {
+          e.preventDefault();
+          toggleThemeSwitcher();
+        } else if (themeListOpen) {
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            cycleTheme(1);
+          } else if (e.shiftKey && e.key === 'Shift') {
+            // Already handled by shift+tab
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const activeCard = document.querySelector('.theme-card.active');
+            if (activeCard) applyTheme(activeCard.dataset.themeId);
+            closethemeSwitcher();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            closethemeSwitcher();
+          }
+        }
+      });
+    }
+
+    function toggleThemeSwitcher() {
+      const themeSwitcher = document.getElementById('themeSwitcher');
+      themeListOpen = !themeListOpen;
+      themeSwitcher.classList.toggle('visible', themeListOpen);
+      if (themeListOpen) {
+        themeListIndex = 0;
+      }
+    }
+
+    function closethemeSwitcher() {
+      const themeSwitcher = document.getElementById('themeSwitcher');
+      themeListOpen = false;
+      themeSwitcher.classList.remove('visible');
+    }
+
+    function cycleTheme(direction) {
+      themeListIndex = (themeListIndex + direction + themeIds.length) % themeIds.length;
+      const themeCards = document.querySelectorAll('.theme-card');
+      themeCards.forEach((card, idx) => {
+        card.classList.toggle('active', idx === themeListIndex);
+      });
     }
 
     // Update slide display

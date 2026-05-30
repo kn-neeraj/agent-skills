@@ -290,3 +290,75 @@ All themes should scale down on smaller screens:
 | Conference talk | Bold |
 | Team retro | Modern |
 | Research findings | Classic |
+
+---
+
+## Theme System
+
+When generating slides, **ALWAYS include the theme system** with these 3 themes:
+
+### Available Themes
+
+1. **Dark Graphite** — Professional dark theme with cool blue accents
+   - Fonts: Space Grotesk (heading) + Inter (body)
+   - Primary: #3b82f6 (blue)
+   - Background: #1a1a1a (dark)
+   - Best for: Professional tech presentations, dark mode audiences
+
+2. **Solace Mist** — Soft, warm neutrals with elegant serif headings
+   - Fonts: Playfair Display (heading) + Montserrat (body)
+   - Primary: #8b7355 (warm brown)
+   - Background: #faf8f6 (off-white)
+   - Best for: Business, consulting, formal presentations
+
+3. **High Contrast** — Bold design with striking color separation
+   - Fonts: Space Grotesk (heading) + Inter (body)
+   - Primary: #dc2626 (red)
+   - Background: #fafafa (light)
+   - Best for: Vision pitches, product launches, attention-grabbing
+
+### Implementation Requirements
+
+**Theme Switcher:**
+- Right-anchored 360px panel
+- 3 theme cards with color preview swatches
+- Hover preview, click to apply
+- Theme persists to localStorage as `leaf.selectedThemeID`
+
+**Keyboard Shortcuts:**
+- `Shift+Tab`: Open/close theme switcher
+- `Tab`: Cycle through themes (when switcher open)
+- `Enter`: Apply selected theme
+- `Escape`: Close switcher
+
+**Theme Button:**
+- Add to navigation bar between Notes and Next buttons
+- Label: "Theme"
+- Same styling as Notes toggle button
+
+**CSS Variables:**
+Every theme MUST define ALL these CSS variables (missing variables = broken styles):
+
+```css
+/* Colors */
+--primary
+--secondary
+--accent
+--background
+--surface
+--text
+--text-light
+
+/* Fonts */
+--font-heading
+--font-body
+
+/* Layout */
+--radius
+```
+
+**Google Fonts Loading:**
+Pre-load all 3 theme font families in a single link:
+```html
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+```
