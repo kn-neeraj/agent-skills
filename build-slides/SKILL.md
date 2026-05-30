@@ -7,28 +7,29 @@ Generate professional presentation slides with golden ratio typography, visual c
 **Agent workflow for generating slides:**
 
 1. **Read Input Files** (in order)
-   - `slide-content.md` — Customer-provided markdown with slide content and structure markers
+   - `slide-content.md` — Customer-provided markdown in slide-by-slide format
    - `components.md` — Structure definitions (Title, Basic, Two-Column, Chart Layout)
    - `styles.md` — Quality systems to apply (typography, spacing, shadows, alignment, colors, themes)
 
 2. **Parse slide-content.md**
-   - Extract slide structure markers (`## title-slide`, `## basic`, `## two-column`, `## chart-layout`)
-   - Extract content for each slide (titles, text, bullets, chart data)
-   - Map content to appropriate structure type
+   - Extract slides: look for `## Slide N: [structure-type]` headers
+   - Extract content: bullets and details under each slide
+   - Identify structure type for each slide (title-slide, basic, two-column, chart-layout)
+   - Handle special syntax: `### Left:` / `### Right:` for two-column, `[CHART: type]` for charts
 
-3. **Apply styles.md to each slide**
-   - Typography: Use golden ratio (1.618) formula from the selected theme
-   - Text alignment: Center-align all text by default (unless override specified)
-   - Spacing: Apply 8px scale margins and padding per structure (from components.md)
-   - Colors: Use theme colors (primary, secondary, accent, text, etc.)
-   - Shadows: Apply shadow hierarchy for interactive elements
-   - Corner radius: Use theme-specific radius (Modern: 6px, Classic: 4px, Bold: 8px)
-
-4. **Apply components.md structure to each slide**
+3. **Apply components.md structure to each slide**
    - Title Slide: Center layout with title, subtitle, description
    - Basic: Title + content area (85% max-width, center-aligned)
    - Two-Column: Title + two equal columns with 30px gap
    - Chart Layout: Title + chart container + text area
+
+4. **Apply styles.md quality systems**
+   - Typography: Use golden ratio (1.618) formula from selected theme
+   - Text alignment: Center-align all text by default (unless override specified)
+   - Spacing: Apply 8px scale margins and padding per structure
+   - Colors: Use theme colors (primary, secondary, accent, text)
+   - Shadows: Apply shadow hierarchy for interactive elements
+   - Corner radius: Use theme-specific radius (Modern: 6px, Classic: 4px, Bold: 8px)
 
 5. **Generate HTML**
    - Create self-contained HTML with inline CSS and JavaScript
@@ -38,11 +39,80 @@ Generate professional presentation slides with golden ratio typography, visual c
 
 ## Input Format
 
-**Customer provides:** `slide-content.md` markdown file
-- Structure markers define layout type for each slide
-- Content organized by structure
-- Iterate and refine as needed
-- Agent regenerates HTML when updated
+**Customer provides:** `slide-content.md` markdown file in slide-by-slide format
+
+```markdown
+# Presentation Title
+
+---
+
+## Slide 1: [Structure Type]
+- Title: [Slide title]
+- [Content details]
+
+---
+
+## Slide 2: [Structure Type]
+- Title: [Slide title]
+- [Content details]
+
+---
+```
+
+**Format rules:**
+- Each slide starts with `## Slide N: [Structure Type]`
+- Structure types: title-slide, basic, two-column, chart-layout
+- List content with bullets under each slide
+- Separate slides with `---`
+- For two-column: Use `### Left:` and `### Right:` headers
+- For chart-layout: Use `[CHART: type]` followed by data
+- Simple and readable — customer iterates, agent regenerates HTML
+
+**Example:**
+```markdown
+# Ladder of AI Knowledge
+
+---
+
+## Slide 1: title-slide
+- Title: Ladder of AI Knowledge
+- Subtitle: From Applied AI to Hardware
+- Description: Understanding the complete AI stack
+
+---
+
+## Slide 2: basic
+- Title: The Four Rungs
+- Content listed with bullets
+
+---
+
+## Slide 3: two-column
+- Title: Comparison
+- Left Column Header: Option A
+  - Point 1
+  - Point 2
+- Right Column Header: Option B
+  - Point 1
+  - Point 2
+
+---
+
+## Slide 4: chart-layout
+- Title: Performance Metrics
+- [CHART: bar]
+  - Label 1: value 1
+  - Label 2: value 2
+- Chart explanation text
+
+---
+```
+
+**Workflow:**
+- Customer edits markdown anytime
+- Agent reads slide-content.md
+- Agent regenerates HTML automatically
+- All quality systems applied from styles.md
 
 ## Workflow
 
