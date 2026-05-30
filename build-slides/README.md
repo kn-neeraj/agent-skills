@@ -26,11 +26,13 @@ See [formats.md](./formats.md) for all 12 available slide formats:
 
 ## Themes
 
-See [styles.md](./styles.md) for the 3 available themes:
+3 interactive themes switchable in-presentation:
 
-- **Modern** - Clean sans-serif, blue/gray palette, generous whitespace
-- **Classic** - Serif headlines, traditional colors, structured layouts
-- **Bold** - High contrast, large type, striking accent colors
+- **Dark Graphite** - Professional dark with cool blue accents
+- **Solace Mist** - Warm neutrals with elegant serif
+- **High Contrast** - Bold design with striking separation
+
+See [styles.md](./styles.md) for details.
 
 ## Charts
 
@@ -41,6 +43,22 @@ Built-in Chart.js patterns for common visualizations:
 - Doughnut charts (composition, distribution, shares)
 
 See [assets/chart-patterns.md](./assets/chart-patterns.md) for code examples.
+
+## Keyboard Shortcuts
+
+During presentation:
+
+| Key | Action |
+|-----|--------|
+| ← / → | Previous / Next slide |
+| Space | Next slide |
+| N | Toggle speaker notes |
+| Shift+Tab | Open theme switcher |
+| Tab | Cycle themes (when open) |
+| Enter | Apply theme |
+| H | Hide / Show navigation bar |
+| F | Fullscreen |
+| Esc | Exit fullscreen |
 
 ## Example Usage
 
