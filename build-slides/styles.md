@@ -58,6 +58,12 @@ All padding, margin, gap values use this scale. No arbitrary pixel values.
 
 Apply uniformly across buttons, cards, images, and rounded elements.
 
+### Text Alignment
+
+**Default:** All headings (H1, H2, H3) and text are **center-aligned** for visual consistency and balance.
+
+Override only when customer explicitly requests left or right alignment.
+
 ### Google Fonts Loading
 
 Each theme loads via CDN with fallback stacks:

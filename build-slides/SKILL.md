@@ -2,43 +2,76 @@
 
 Generate professional presentation slides with golden ratio typography, visual consistency, interactive features, and data visualizations.
 
+## Skill Orchestration
+
+**Agent workflow for generating slides:**
+
+1. **Read Input Files** (in order)
+   - `slide-content.md` — Customer-provided markdown with slide content and structure markers
+   - `components.md` — Structure definitions (Title, Basic, Two-Column, Chart Layout)
+   - `styles.md` — Quality systems to apply (typography, spacing, shadows, alignment, colors, themes)
+
+2. **Parse slide-content.md**
+   - Extract slide structure markers (`## title-slide`, `## basic`, `## two-column`, `## chart-layout`)
+   - Extract content for each slide (titles, text, bullets, chart data)
+   - Map content to appropriate structure type
+
+3. **Apply styles.md to each slide**
+   - Typography: Use golden ratio (1.618) formula from the selected theme
+   - Text alignment: Center-align all text by default (unless override specified)
+   - Spacing: Apply 8px scale margins and padding per structure (from components.md)
+   - Colors: Use theme colors (primary, secondary, accent, text, etc.)
+   - Shadows: Apply shadow hierarchy for interactive elements
+   - Corner radius: Use theme-specific radius (Modern: 6px, Classic: 4px, Bold: 8px)
+
+4. **Apply components.md structure to each slide**
+   - Title Slide: Center layout with title, subtitle, description
+   - Basic: Title + content area (85% max-width, center-aligned)
+   - Two-Column: Title + two equal columns with 30px gap
+   - Chart Layout: Title + chart container + text area
+
+5. **Generate HTML**
+   - Create self-contained HTML with inline CSS and JavaScript
+   - Include navigation controls, keyboard support, speaker notes
+   - Apply all quality systems from styles.md
+   - Ensure responsive design (320px+) and print-friendly CSS
+
+## Input Format
+
+**Customer provides:** `slide-content.md` markdown file
+- Structure markers define layout type for each slide
+- Content organized by structure
+- Iterate and refine as needed
+- Agent regenerates HTML when updated
+
 ## Workflow
 
 1. **Understand Requirements**
-   - Parse user request for topic, slide count, format preferences
-   - Identify target audience and presentation context
-   - Determine if charts/visualizations are needed
-   - Confirm if speaker notes will be included
+   - Parse user request for topic, slide count, theme preference
+   - Identify target audience and context
 
-2. **Select Format & Theme**
-   - Choose from 12 predefined slide formats (see formats.md)
-   - Match format to content type (pitch, tutorial, report, etc.)
-   - Select from 3 themes: Modern (clean/tech), Classic (formal/business), Bold (striking/creative)
+2. **Select Theme**
+   - Choose from 3 themes: Modern, Classic, Bold (see styles.md)
+   - Applies typography, colors, spacing system throughout
 
-3. **Build HTML Structure with Quality Systems**
-   - Generate base HTML with all quality systems baked in:
-     - **Typography:** Apply golden ratio formula (1.618) for font sizes; load Google Fonts via CDN per theme
-     - **Spacing:** Use 8px-based scale for all padding/margin/gap (4, 8, 16, 24, 32, 48, 64, 96px)
-     - **Visual Depth:** Apply shadow hierarchy (subtle for cards, medium for floating, deep for emphasis)
-     - **Navigation:** Include prev/next buttons, slide counter (X/Y), progress bar
-     - **Notes Panel:** Include hidden notes panel with toggle button
-     - **Keyboard Support:** Inject keyboard handler for arrow keys, space, F, ESC, N
-     - **Interactive States:** Apply CSS for button hover (lift effect), focus rings, transitions (300ms)
-   - See styles.md for complete system specifications
+3. **Read Instruction Files**
+   - Read `slide-content.md` for content and structure markers
+   - Read `components.md` for structure definitions
+   - Read `styles.md` for quality systems to apply
 
-4. **Generate Content**
-   - Create slide-by-slide content following format templates
-   - Write clear, concise copy optimized for presentations
-   - Include speaker notes for presenter view
-   - Maintain consistent spacing and hierarchy from typography formula
+4. **Generate HTML**
+   - Parse slide-content.md structure markers
+   - Apply components.md layout for each structure
+   - Apply styles.md quality systems (typography, spacing, alignment, colors)
+   - Include navigation, keyboard support, speaker notes
 
-5. **Add Visualizations**
+6. **Add Visualizations**
    - Implement charts using Chart.js patterns (see assets/chart-patterns.md)
    - Use chart color injection helper to automatically inherit theme colors
    - Choose appropriate chart type for data
-   - Ensure charts fit within slide padding boundaries
+   - Ensure charts fit within slide padding boundaries and respect margins from components.md
 
-6. **Assemble Output**
+7. **Assemble Output**
    - Combine HTML structure, content, styles, and scripts
    - Verify all interactive features functional
    - Test navigation, keyboard shortcuts, notes toggle
@@ -81,6 +114,9 @@ Before delivering slides, verify:
 - [ ] Slide count matches user request
 - [ ] No lorem ipsum or placeholder text
 - [ ] Speaker notes included where needed
+- [ ] Each slide uses appropriate structure from components.md (Title, Basic, Two-Column, Chart Layout)
+- [ ] Content is organized logically within chosen structures
+- [ ] Margins and spacing match components.md guidelines (no random padding)
 
 **Quality Systems**
 - [ ] Golden ratio typography applied (H1 → H2 → H3 → body hierarchy from formula)

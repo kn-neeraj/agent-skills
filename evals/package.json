@@ -1,0 +1,20 @@
+{
+  "name": "html-slides-evals",
+  "version": "1.0.0",
+  "description": "Automated evaluation system for HTML slides skill",
+  "main": "eval.js",
+  "scripts": {
+    "eval": "node eval.js",
+    "eval:dev": "DEBUG=* node eval.js"
+  },
+  "keywords": ["evaluation", "slides", "automation"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "playwright": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
