@@ -1,6 +1,6 @@
 # Build Slides Skill
 
-Generate professional presentation slides with structured formats, consistent themes, and data visualizations.
+Generate professional presentation slides with golden ratio typography, visual consistency, interactive features, and data visualizations.
 
 ## Workflow
 
@@ -8,26 +8,41 @@ Generate professional presentation slides with structured formats, consistent th
    - Parse user request for topic, slide count, format preferences
    - Identify target audience and presentation context
    - Determine if charts/visualizations are needed
+   - Confirm if speaker notes will be included
 
-2. **Select Format**
+2. **Select Format & Theme**
    - Choose from 12 predefined slide formats (see formats.md)
    - Match format to content type (pitch, tutorial, report, etc.)
-   - Apply consistent structure across deck
+   - Select from 3 themes: Modern (clean/tech), Classic (formal/business), Bold (striking/creative)
 
-3. **Apply Theme**
-   - Select from 3 available themes (see styles.md)
-   - Apply typography scale and color palette
-   - Ensure visual hierarchy and readability
+3. **Build HTML Structure with Quality Systems**
+   - Generate base HTML with all quality systems baked in:
+     - **Typography:** Apply golden ratio formula (1.618) for font sizes; load Google Fonts via CDN per theme
+     - **Spacing:** Use 8px-based scale for all padding/margin/gap (4, 8, 16, 24, 32, 48, 64, 96px)
+     - **Visual Depth:** Apply shadow hierarchy (subtle for cards, medium for floating, deep for emphasis)
+     - **Navigation:** Include prev/next buttons, slide counter (X/Y), progress bar
+     - **Notes Panel:** Include hidden notes panel with toggle button
+     - **Keyboard Support:** Inject keyboard handler for arrow keys, space, F, ESC, N
+     - **Interactive States:** Apply CSS for button hover (lift effect), focus rings, transitions (300ms)
+   - See styles.md for complete system specifications
 
 4. **Generate Content**
    - Create slide-by-slide content following format templates
    - Write clear, concise copy optimized for presentations
-   - Include speaker notes where appropriate
+   - Include speaker notes for presenter view
+   - Maintain consistent spacing and hierarchy from typography formula
 
 5. **Add Visualizations**
    - Implement charts using Chart.js patterns (see assets/chart-patterns.md)
+   - Use chart color injection helper to automatically inherit theme colors
    - Choose appropriate chart type for data
-   - Apply theme colors to visualizations
+   - Ensure charts fit within slide padding boundaries
+
+6. **Assemble Output**
+   - Combine HTML structure, content, styles, and scripts
+   - Verify all interactive features functional
+   - Test navigation, keyboard shortcuts, notes toggle
+   - Ensure mobile responsive (320px+) and print-friendly
 
 ## Architecture Rules
 
@@ -61,14 +76,35 @@ Generate slides as HTML files:
 
 Before delivering slides, verify:
 
+**Content & Format**
 - [ ] All slides follow selected format template
-- [ ] Theme is applied consistently across deck
-- [ ] Typography scale is respected
-- [ ] Charts render correctly with sample data
 - [ ] Slide count matches user request
 - [ ] No lorem ipsum or placeholder text
 - [ ] Speaker notes included where needed
-- [ ] Responsive layout works on mobile
+
+**Quality Systems**
+- [ ] Golden ratio typography applied (H1 → H2 → H3 → body hierarchy from formula)
+- [ ] Google Fonts loaded correctly via CDN
+- [ ] Spacing uses 8px scale (no arbitrary pixel values)
+- [ ] Shadow hierarchy visible (subtle on cards, medium on floating elements)
+- [ ] Corner radius consistent across elements
+
+**Features**
+- [ ] Navigation controls visible (prev/next buttons, counter, progress bar)
+- [ ] Keyboard shortcuts work (arrows, space, F, ESC, N)
+- [ ] Notes panel toggles and displays current slide notes
+- [ ] Button hover effects visible (lift + shadow)
+- [ ] Focus indicators visible with keyboard navigation
+- [ ] Slide transitions smooth (fade, ≤300ms)
+
+**Data & Visualizations**
+- [ ] Charts render correctly with theme colors auto-injected
+- [ ] Charts responsive (fit within slide width, no overflow)
+- [ ] Sample data is realistic or actual data provided
+
+**Responsive & Accessibility**
+- [ ] Mobile responsive (320px viewport readable, 44px touch targets)
+- [ ] Print-friendly (controls hidden, page breaks between slides)
 - [ ] No broken references or missing assets
 
 ## Error Handling
