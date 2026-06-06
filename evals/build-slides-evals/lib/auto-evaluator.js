@@ -3,15 +3,21 @@
  *
  * Automatically evaluates generated HTML slides against the rubric
  * using Claude's assessment of the presentation quality.
+ * Uses the existing eval judge (scorer.js) and rubric.md
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
+const path = require('path');
 
 const client = new Anthropic();
 
+// Load the existing rubric
+const RUBRIC_PATH = path.join(__dirname, '../rubric.md');
+const rubric = fs.readFileSync(RUBRIC_PATH, 'utf-8');
+
 /**
- * Automatically evaluate HTML slides
+ * Automatically evaluate HTML slides using the existing eval judge
  *
  * @param {string} htmlPath - Path to the generated HTML file
  * @param {string} promptText - Original prompt that was used
@@ -19,62 +25,35 @@ const client = new Anthropic();
  * @returns {Promise<Object>} - Scores object { readability, composition, consistency, functionality, notes }
  */
 async function autoEvaluate(htmlPath, promptText, promptName) {
-  console.log('  🔍 Evaluating slides...');
+  console.log('  🔍 Evaluating slides using eval judge...');
 
   try {
     // Read the HTML content
     const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
 
-    // Create evaluation prompt for Claude
-    const evaluationPrompt = `You are a presentation design expert evaluating an automatically-generated HTML presentation.
+    // Create evaluation prompt using the existing rubric
+    const evaluationPrompt = `You are evaluating an HTML slide presentation against this visual rubric:
+
+${rubric}
 
 PRESENTATION CONTEXT:
 - Prompt: "${promptText}"
 - Prompt ID: ${promptName}
 
-HTML CONTENT TO EVALUATE:
+HTML CONTENT (first 2000 chars):
 \`\`\`html
-${htmlContent.substring(0, 3000)}...
+${htmlContent.substring(0, 2000)}...
 \`\`\`
 
-SCORING RUBRIC (1-5 scale):
+Analyze the generated HTML presentation and score it on the 4 criteria from the rubric.
 
-**Readability** - Text clarity, hierarchy, contrast, sizing
-- 5: Clear hierarchy, excellent contrast, appropriately sized text, no cramped content
-- 4: Good hierarchy, mostly clear, minor contrast issues
-- 3: Readable but hierarchy unclear or text slightly small/large
-- 2: Hard to read, poor hierarchy, contrast issues
-- 1: Illegible, terrible contrast, unreadable
-
-**Composition** - Layout balance, whitespace, element positioning
-- 5: Well-balanced, excellent whitespace, all elements properly positioned, nothing cut off
-- 4: Good layout, appropriate spacing, minor alignment issues
-- 3: Acceptable layout but uneven spacing or crowded in places
-- 2: Poor balance, awkward spacing, some elements poorly positioned
-- 1: Chaotic layout, overlapping elements, content overflow
-
-**Consistency** - Visual uniformity (fonts, colors, spacing) across slides
-- 5: Perfectly consistent fonts, colors, spacing across all slides
-- 4: Mostly consistent with minor variations
-- 3: Generally consistent but some drift in styles
-- 2: Inconsistent, noticeable style variations
-- 1: Chaotic, every slide looks different
-
-**Functionality** - Works/Broken
-- Works: Navigation buttons responsive, keyboard shortcuts functional, no visual glitches
-- Broken: Any functionality fails (nav broken, keyboard unresponsive, visual glitches)
-
-EVALUATION TASK:
-Carefully analyze the generated HTML and provide scores for each criterion.
-Focus on what was actually generated, not what could be improved.
-
-Respond in this exact JSON format only:
+Respond ONLY with valid JSON (no markdown, no explanation):
 {
   "readability": <1-5>,
   "composition": <1-5>,
   "consistency": <1-5>,
-  "functionality": "<Works or Broken>",
-  "notes": "<brief assessment of key observations>"
+  "functionality": "<Works|Broken>",
+  "notes": "<brief assessment>"
 }`;
 
     const response = await client.messages.create({
@@ -93,7 +72,17 @@ Respond in this exact JSON format only:
 
     // Extract JSON from response
     let jsonStr = responseText;
-    if (responseText.includes('{')) {
+    if (responseText.includes('```json')) {
+      const match = responseText.match(/```json\n([\s\S]*?)\n```/);
+      if (match) {
+        jsonStr = match[1];
+      }
+    } else if (responseText.includes('```')) {
+      const match = responseText.match(/```\n([\s\S]*?)\n```/);
+      if (match) {
+        jsonStr = match[1];
+      }
+    } else if (responseText.includes('{')) {
       jsonStr = responseText.substring(
         responseText.indexOf('{'),
         responseText.lastIndexOf('}') + 1
@@ -109,13 +98,16 @@ Respond in this exact JSON format only:
       !Number.isInteger(scores.consistency) ||
       ![1, 2, 3, 4, 5].includes(scores.readability) ||
       ![1, 2, 3, 4, 5].includes(scores.composition) ||
-      ![1, 2, 3, 4, 5].includes(scores.consistency)
+      ![1, 2, 3, 4, 5].includes(scores.consistency) ||
+      !['Works', 'Broken'].includes(scores.functionality)
     ) {
-      throw new Error('Invalid score values in response');
+      throw new Error(
+        `Invalid score values in response: ${JSON.stringify(scores)}`
+      );
     }
 
     console.log(
-      `  ✓ Evaluated - R:${scores.readability} C:${scores.composition} Co:${scores.consistency} F:${scores.functionality}`
+      `  ✓ Evaluated - Readability:${scores.readability} Composition:${scores.composition} Consistency:${scores.consistency} Functionality:${scores.functionality}`
     );
 
     return scores;
