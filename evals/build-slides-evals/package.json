@@ -4,8 +4,9 @@
   "description": "Automated evaluation system for HTML slides skill",
   "main": "eval.js",
   "scripts": {
-    "eval": "node eval.js",
-    "eval:dev": "DEBUG=* node eval.js"
+    "eval": "node evaluate-automated.js",
+    "eval:auto": "node evaluate-automated.js",
+    "eval:dev": "DEBUG=* node evaluate-automated.js"
   },
   "keywords": ["evaluation", "slides", "automation"],
   "author": "",
