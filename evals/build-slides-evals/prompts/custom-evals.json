@@ -1,0 +1,91 @@
+{
+  "name": "custom-evals",
+  "description": "Custom evaluation suite for testing diverse build-slides skill scenarios",
+  "created": "2026-06-06",
+  "prompts": [
+    {
+      "name": "pitch-tech-startup",
+      "prompt": "Create a 5-slide pitch deck for an AI-powered customer support startup targeting venture capital investors. Include: problem statement, solution, market size, team, and funding ask.",
+      "category": "business_pitch",
+      "length": 5,
+      "description": "Tests structured business narrative and professional hierarchy"
+    },
+    {
+      "name": "marketing-campaign",
+      "prompt": "Design a 4-slide marketing overview for a new SaaS product launch. Include value proposition, key features, pricing tiers, and call to action.",
+      "category": "marketing",
+      "length": 4,
+      "description": "Tests marketing content with visual appeal and clear hierarchy"
+    },
+    {
+      "name": "training-python",
+      "prompt": "Build an 8-slide training presentation on Python basics. Cover: intro, variables, data types, operators, control flow, functions, and summary.",
+      "category": "educational",
+      "length": 8,
+      "description": "Tests handling of technical educational content with code examples"
+    },
+    {
+      "name": "quarterly-financial",
+      "prompt": "Create a 10-slide quarterly financial review. Include revenue trends, expense breakdown, profit margins, key metrics, and forward guidance.",
+      "category": "financial",
+      "length": 10,
+      "description": "Tests handling of data-heavy financial presentations"
+    },
+    {
+      "name": "product-roadmap",
+      "prompt": "Design a 6-slide product roadmap presentation. Show Q1-Q3 priorities, key features planned, timeline, resource allocation, and success metrics.",
+      "category": "product",
+      "length": 6,
+      "description": "Tests timeline and planning visualization"
+    },
+    {
+      "name": "climate-data",
+      "prompt": "Build a 3-slide overview of global climate data. Include temperature trends, carbon emissions, and projected impacts with visual emphasis.",
+      "category": "educational",
+      "length": 3,
+      "description": "Tests short-form data visualization"
+    },
+    {
+      "name": "company-culture",
+      "prompt": "Create a 7-slide company culture presentation for new hires. Cover values, mission, team structure, benefits, onboarding, and career growth.",
+      "category": "internal",
+      "length": 7,
+      "description": "Tests employee-focused content with cultural messaging"
+    },
+    {
+      "name": "technical-architecture",
+      "prompt": "Design a 12-slide technical architecture overview. Include system components, data flow, API design, security considerations, and scalability approach.",
+      "category": "technical",
+      "length": 12,
+      "description": "Tests complex technical content and diagram representation"
+    },
+    {
+      "name": "event-proposal",
+      "prompt": "Build a 4-slide conference talk proposal. Include abstract, key takeaways, audience level, and speaker bio.",
+      "category": "event",
+      "length": 4,
+      "description": "Tests proposal format with concise messaging"
+    },
+    {
+      "name": "minimal-brief",
+      "prompt": "Create slides about digital transformation. Keep it simple and professional.",
+      "category": "edge_case",
+      "length": 3,
+      "description": "Tests handling of vague/minimal prompts"
+    },
+    {
+      "name": "text-heavy",
+      "prompt": "Create a 5-slide detailed technical specification document for a real-time data processing system. Each slide should be comprehensive with multiple bullet points.",
+      "category": "edge_case",
+      "length": 5,
+      "description": "Tests handling of text-heavy content without overflow"
+    },
+    {
+      "name": "image-heavy",
+      "prompt": "Design a 6-slide visual portfolio of sustainable architecture projects. Emphasize imagery, minimal text, professional layout.",
+      "category": "edge_case",
+      "length": 6,
+      "description": "Tests visual composition and spacing with imagery focus"
+    }
+  ]
+}
