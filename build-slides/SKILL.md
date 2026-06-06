@@ -2,6 +2,19 @@
 
 Generate professional presentation slides with golden ratio typography, visual consistency, interactive features, and data visualizations.
 
+## CRITICAL REQUIREMENTS
+
+**These must be followed EXACTLY to generate working slides:**
+
+1. **Self-contained HTML**: NO external CDN fonts or dependencies. Use system fonts only (Arial, Helvetica, Verdana, Georgia, monospace)
+2. **Works offline**: All HTML must work when opened as `file://` without a web server
+3. **Proper slide initialization**:
+   - ONLY the first slide has `class="slide active"`
+   - All other slides have `class="slide"` (no active class)
+   - Theme switcher has `class="theme-switcher"` (NO active class by default)
+4. **JavaScript initialization**: Must run immediately without errors
+5. **Text visibility**: All text must be visible with proper contrast
+
 ## Skill Orchestration
 
 **Agent workflow for generating slides:**
@@ -30,12 +43,14 @@ Generate professional presentation slides with golden ratio typography, visual c
    - Colors: Use theme colors (primary, secondary, accent, text)
    - Shadows: Apply shadow hierarchy for interactive elements
    - Corner radius: Use theme-specific radius (Modern: 6px, Classic: 4px, Bold: 8px)
+   - **Font families: Use system fonts ONLY** (no Google Fonts or CDN)
 
 5. **Generate HTML**
    - Create self-contained HTML with inline CSS and JavaScript
    - Include navigation controls, keyboard support, speaker notes
    - Apply all quality systems from styles.md
    - Ensure responsive design (320px+) and print-friendly CSS
+   - **NO external resources**: All CSS/JS inline, system fonts only
 
 ## Input Format
 
@@ -195,10 +210,17 @@ Before delivering slides, verify:
 
 **Quality Systems**
 - [ ] Golden ratio typography applied (H1 → H2 → H3 → body hierarchy from formula)
-- [ ] Google Fonts loaded correctly via CDN
+- [ ] **NO Google Fonts or external CDN** - system fonts only
 - [ ] Spacing uses 8px scale (no arbitrary pixel values)
 - [ ] Shadow hierarchy visible (subtle on cards, medium on floating elements)
 - [ ] Corner radius consistent across elements
+
+**Initialization & HTML Structure**
+- [ ] **ONLY first slide has `class="slide active"`** - all others have `class="slide"` only
+- [ ] **Theme switcher has NO class by default** - `class="theme-switcher"` (not `.active`)
+- [ ] All CSS is inlined in `<style>` tag
+- [ ] All JavaScript is inlined in `<script>` tag
+- [ ] No external script/link tags (except Chart.js if needed)
 
 **Features**
 - [ ] Navigation controls visible (prev/next buttons, counter, progress bar)
@@ -207,6 +229,7 @@ Before delivering slides, verify:
 - [ ] Button hover effects visible (lift + shadow)
 - [ ] Focus indicators visible with keyboard navigation
 - [ ] Slide transitions smooth (fade, ≤300ms)
+- [ ] **All text is visible** - proper color contrast on first load
 
 **Data & Visualizations**
 - [ ] Charts render correctly with theme colors auto-injected
@@ -216,7 +239,63 @@ Before delivering slides, verify:
 **Responsive & Accessibility**
 - [ ] Mobile responsive (320px viewport readable, 44px touch targets)
 - [ ] Print-friendly (controls hidden, page breaks between slides)
-- [ ] No broken references or missing assets
+- [ ] **Works with `file://` protocol** - no console errors
+- [ ] **Works offline** - no external resources required
+
+## JavaScript Initialization Rules
+
+**CRITICAL**: The first slide MUST be visible immediately when page loads.
+
+```javascript
+// At the VERY END of <script>, call:
+let currentSlide = 1;
+showSlide(currentSlide);
+
+function showSlide(n) {
+  const slides = document.querySelectorAll('.slide');
+  slides.forEach(s => s.classList.remove('active', 'prev'));
+  slides[n - 1].classList.add('active');
+  if (n > 1) slides[n - 2].classList.add('prev');
+  // Update UI...
+}
+```
+
+**DO NOT:**
+- Add `.active` class to theme-switcher on load
+- Call `selectTheme()` before `showSlide()`
+- Use localStorage defaults that trigger theme changes
+
+**DO:**
+- Initialize slides FIRST
+- Show first slide FIRST
+- Then handle theme/notes
+
+## HTML Structure Rules
+
+**Slide divs MUST be formatted as:**
+```html
+<!-- Slide 1 - ONLY this slide has .active -->
+<div class="slide active" data-slide="1">
+  <h1>Title</h1>
+  <p>Content</p>
+</div>
+
+<!-- Slide 2 - NO .active class -->
+<div class="slide" data-slide="2">
+  <h2>Title</h2>
+  <p>Content</p>
+</div>
+
+<!-- Theme switcher - NO class by default -->
+<div class="theme-switcher" id="themeSwitcher">
+  <!-- theme cards -->
+</div>
+```
+
+**NEVER:**
+- Add `class="active"` to theme-switcher on load
+- Add `class="prev"` to any slide in HTML (only add via JavaScript)
+- Use `class="title-slide active prev"` - use single class where needed
 
 ## Error Handling
 
@@ -229,3 +308,9 @@ If chart data is needed but not provided:
 - Use realistic sample data
 - Note in speaker notes that data should be updated
 - Provide instructions for data updates
+
+**If generated HTML shows blank/empty slides:**
+- Check that first slide has `class="slide active"`
+- Check that all text colors have sufficient contrast
+- Check that theme-switcher does NOT have `.active` class on load
+- Verify no JavaScript errors in console

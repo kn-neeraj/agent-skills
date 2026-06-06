@@ -5,15 +5,14 @@
   "main": "eval.js",
   "scripts": {
     "eval:setup": "node lib/setup.js",
-    "eval": "node evaluate-automated.js",
-    "eval:auto": "node evaluate-automated.js",
-    "eval:dev": "DEBUG=* node evaluate-automated.js"
+    "eval": "node eval.js",
+    "eval:auto": "node eval.js",
+    "eval:dev": "DEBUG=* node eval.js"
   },
   "keywords": ["evaluation", "slides", "automation"],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
     "playwright": "^1.40.0"
   },
   "engines": {

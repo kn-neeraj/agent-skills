@@ -9,14 +9,26 @@ const playwright = require('playwright');
 
 async function captureScreenshots(htmlPath, promptId, outputDir) {
   const browser = await playwright.chromium.launch();
-  const context = await browser.createContext({
+  const page = await browser.newPage({
     viewport: { width: 1280, height: 720 },
   });
-  const page = await context.newPage();
 
-  // Load HTML file
+  // Load HTML file with proper waits
   const htmlUrl = `file://${path.resolve(htmlPath)}`;
   await page.goto(htmlUrl, { waitUntil: 'networkidle' });
+
+  // Wait for fonts to load and JavaScript to initialize
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000); // Extra time for JS initialization
+
+  // Ensure first slide is visible and rendered
+  await page.evaluate(() => {
+    // Wait for fonts
+    if (document.fonts && document.fonts.ready) {
+      return document.fonts.ready;
+    }
+    return Promise.resolve();
+  });
 
   const screenshotPaths = [];
   const screenshotDir = path.join(outputDir, 'screenshots', promptId);
@@ -32,14 +44,8 @@ async function captureScreenshots(htmlPath, promptId, outputDir) {
 
   const numSlides = slideCount > 0 ? slideCount : 1;
 
-  // Capture first, middle, and last slides
-  const slidesToCapture = [0];
-  if (numSlides > 2) {
-    slidesToCapture.push(Math.floor(numSlides / 2));
-  }
-  if (numSlides > 1) {
-    slidesToCapture.push(numSlides - 1);
-  }
+  // Capture ALL slides
+  const slidesToCapture = Array.from({ length: numSlides }, (_, i) => i);
 
   for (const slideIndex of slidesToCapture) {
     try {
@@ -71,7 +77,7 @@ async function captureScreenshots(htmlPath, promptId, outputDir) {
     screenshotPaths.push(filePath);
   }
 
-  await context.close();
+  await page.close();
   await browser.close();
 
   return screenshotPaths;

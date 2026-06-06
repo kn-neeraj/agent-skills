@@ -1,118 +1,143 @@
 #!/usr/bin/env node
 
 /**
- * HTML Slides Skill - Automated Evaluation Runner
+ * Build Slides Skill - Screenshot-based Evaluation
  *
- * Workflow:
- * 1. Load prompts from dataset.json
- * 2. Generate slides for each prompt via Claude API
- * 3. Capture screenshots
- * 4. Score using vision-based rubric
- * 5. Generate results report
+ * Simple workflow:
+ * 1. Take screenshots of generated slides
+ * 2. Send to OpenRouter LLM with evaluation prompt
+ * 3. Get visual quality scores (readability, composition, consistency, functionality)
+ * 4. Store results
+ *
+ * Usage:
+ *   npm run eval:setup                    # Configure API key once
+ *   npm run eval:auto -- --html-path path/to/slides.html --prompt-name "name"
  */
 
 const fs = require('fs');
 const path = require('path');
-const { generateSlides } = require('./lib/generator');
-const { captureScreenshots } = require('./lib/screenshotter');
-const { scoreSlides } = require('./lib/scorer');
+const { evaluateSlides } = require('./lib/screenshot-evaluator');
+const { getConfig } = require('./lib/config');
 const { generateReport } = require('./lib/report-generator');
+const { generateHTMLReport } = require('./lib/html-report-generator');
 
-const DATASET_PATH = path.join(__dirname, 'dataset.json');
 const RESULTS_DIR = path.join(__dirname, 'results');
-const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-');
-const RUN_DIR = path.join(RESULTS_DIR, `run-${TIMESTAMP}`);
+const EVALUATIONS_FILE = path.join(RESULTS_DIR, 'evaluations.json');
+const REPORT_FILE = path.join(RESULTS_DIR, 'EVALUATIONS.md');
+const HTML_REPORT_FILE = path.join(RESULTS_DIR, 'EVALUATIONS.html');
 
-async function main() {
-  console.log('🎬 HTML Slides Skill - Evaluation Runner');
-  console.log(`📁 Results directory: ${RUN_DIR}\n`);
+// Parse CLI arguments
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const result = { htmlPath: null, promptName: null, promptText: null };
 
-  // Load dataset
-  const dataset = JSON.parse(fs.readFileSync(DATASET_PATH, 'utf-8'));
-  const prompts = dataset.prompts;
-  console.log(`📊 Dataset: ${prompts.length} prompts loaded\n`);
-
-  // Create results directory
-  if (!fs.existsSync(RUN_DIR)) {
-    fs.mkdirSync(RUN_DIR, { recursive: true });
-  }
-
-  const results = [];
-
-  for (let i = 0; i < prompts.length; i++) {
-    const prompt = prompts[i];
-    console.log(`[${i + 1}/${prompts.length}] ${prompt.id}...`);
-
-    try {
-      // Step 1: Generate slides
-      console.log('  → Generating slides');
-      const htmlPath = await generateSlides(prompt, RUN_DIR);
-
-      // Step 2: Capture screenshots
-      console.log('  → Capturing screenshots');
-      const screenshotPaths = await captureScreenshots(htmlPath, prompt.id, RUN_DIR);
-
-      // Step 3: Score using vision API
-      console.log('  → Scoring with vision model');
-      const scores = await scoreSlides(screenshotPaths, prompt);
-
-      // Step 4: Compile result
-      const result = {
-        promptId: prompt.id,
-        category: prompt.category,
-        slideCount: prompt.length,
-        htmlPath,
-        screenshotPaths,
-        ...scores,
-        timestamp: new Date().toISOString(),
-      };
-
-      results.push(result);
-      console.log(`  ✓ Complete\n`);
-    } catch (error) {
-      console.error(`  ✗ Error: ${error.message}\n`);
-      results.push({
-        promptId: prompt.id,
-        error: error.message,
-      });
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--html-path' && i + 1 < args.length) {
+      result.htmlPath = args[i + 1];
+      i++;
+    } else if (args[i] === '--prompt-name' && i + 1 < args.length) {
+      result.promptName = args[i + 1];
+      i++;
+    } else if (args[i] === '--prompt-text' && i + 1 < args.length) {
+      result.promptText = args[i + 1];
+      i++;
     }
   }
+  return result;
+}
 
-  // Step 5: Generate report
-  console.log('\n📈 Generating report...');
-  const report = generateReport(results, prompts);
+async function main() {
+  const args = parseArgs();
 
-  const reportPath = path.join(RUN_DIR, 'RESULTS.md');
-  fs.writeFileSync(reportPath, report);
-  console.log(`✓ Report saved: ${reportPath}`);
+  console.log('\n' + '='.repeat(70));
+  console.log('Build Slides Skill - Screenshot Evaluation');
+  console.log('='.repeat(70) + '\n');
 
-  // Save raw results
-  const rawPath = path.join(RUN_DIR, 'results.json');
-  fs.writeFileSync(rawPath, JSON.stringify(results, null, 2));
-  console.log(`✓ Raw results saved: ${rawPath}`);
+  try {
+    // Validate input
+    if (!args.htmlPath) {
+      console.log('Usage:');
+      console.log('  npm run eval:auto -- --html-path path/to/slides.html --prompt-name "name"\n');
+      console.log('First time? Run: npm run eval:setup\n');
+      process.exit(1);
+    }
 
-  // Print summary
-  console.log('\n' + '='.repeat(60));
-  console.log('EVALUATION COMPLETE');
-  console.log('='.repeat(60));
-  console.log(`Total prompts: ${prompts.length}`);
-  console.log(`Successful: ${results.filter(r => !r.error).length}`);
-  console.log(`Failed: ${results.filter(r => r.error).length}`);
+    // Verify file exists
+    const htmlPath = path.resolve(args.htmlPath);
+    if (!fs.existsSync(htmlPath)) {
+      throw new Error(`HTML file not found: ${htmlPath}`);
+    }
 
-  const successfulResults = results.filter(r => !r.error);
-  if (successfulResults.length > 0) {
-    const avgVisualQuality =
-      successfulResults.reduce((sum, r) => sum + (r.visualQualityScore || 0), 0) /
-      successfulResults.length;
-    const functionalityPassRate =
-      (successfulResults.filter(r => r.functionality === 'Works').length /
-      successfulResults.length * 100).toFixed(1);
+    // Load config
+    const config = getConfig();
+    console.log(`📝 Using ${config.provider} • Model: ${config.model}\n`);
 
-    console.log(`\nAverage Visual Quality: ${avgVisualQuality.toFixed(2)}/5.0`);
-    console.log(`Functionality Pass Rate: ${functionalityPassRate}%`);
+    // Derive name from filename if not provided
+    const promptName = args.promptName || path.basename(htmlPath, '.html');
+    const promptText = args.promptText || '';
+
+    console.log(`📊 Evaluating: ${promptName}`);
+    if (promptText) {
+      console.log(`💬 Prompt: "${promptText.substring(0, 60)}${promptText.length > 60 ? '...' : ''}"\n`);
+    }
+
+    // Create results directory
+    if (!fs.existsSync(RESULTS_DIR)) {
+      fs.mkdirSync(RESULTS_DIR, { recursive: true });
+    }
+
+    // Evaluate slides
+    console.log('🎬 Capturing screenshots and evaluating...\n');
+    const scores = await evaluateSlides(htmlPath, promptText, promptName, config);
+
+    // Save results
+    let evaluations = [];
+    if (fs.existsSync(EVALUATIONS_FILE)) {
+      evaluations = JSON.parse(fs.readFileSync(EVALUATIONS_FILE, 'utf-8'));
+    }
+
+    evaluations.push({
+      id: evaluations.length + 1,
+      promptName,
+      promptText,
+      htmlFile: htmlPath,
+      scores,
+      timestamp: new Date().toISOString(),
+    });
+
+    fs.writeFileSync(EVALUATIONS_FILE, JSON.stringify(evaluations, null, 2));
+
+    // Generate consolidated reports
+    const report = generateReport(EVALUATIONS_FILE);
+    fs.writeFileSync(REPORT_FILE, report);
+
+    const htmlReport = generateHTMLReport(EVALUATIONS_FILE);
+    fs.writeFileSync(HTML_REPORT_FILE, htmlReport);
+
+    // Display results
+    console.log('✅ EVALUATION COMPLETE\n');
+    console.log(`📈 Scores for: ${promptName}`);
+    console.log(`   Readability:  ${scores.readability}/5`);
+    console.log(`   Composition:  ${scores.composition}/5`);
+    console.log(`   Consistency:  ${scores.consistency}/5`);
+    console.log(`   Functionality: ${scores.functionality}`);
+    const visualAvg = ((scores.readability + scores.composition + scores.consistency) / 3).toFixed(1);
+    console.log(`   Visual Quality Avg: ${visualAvg}/5\n`);
+
+    if (scores.notes) {
+      console.log(`📝 Notes: ${scores.notes}\n`);
+    }
+
+    console.log(`📂 Results saved to:`);
+    console.log(`   JSON: ${EVALUATIONS_FILE}`);
+    console.log(`   Markdown: ${REPORT_FILE}`);
+    console.log(`   HTML: ${HTML_REPORT_FILE}\n`);
+    console.log(`🌐 View HTML report in browser:`);
+    console.log(`   open ${HTML_REPORT_FILE}\n`);
+  } catch (error) {
+    console.error(`\n❌ Error: ${error.message}\n`);
+    process.exit(1);
   }
-
-  console.log(`\n📁 View results: ${reportPath}`);
 }
 
 main().catch(console.error);
