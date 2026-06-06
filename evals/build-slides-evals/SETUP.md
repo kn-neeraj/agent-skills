@@ -2,9 +2,7 @@
 
 ## Quick Start
 
-The evaluation system uses a **one-time setup** to configure your API credentials. No need to manage environment variables!
-
-### Step 1: Configure Your API
+### Step 1: Configure Your API (One-time)
 
 ```bash
 npm run eval:setup
@@ -19,16 +17,23 @@ This will prompt you to:
 
 Your configuration is saved to `.evalrc.json` (automatically ignored by git).
 
-### Step 2: Run Evaluations
+### Step 2: Create Slides with /build-slides Skill
+
+```
+/build-slides Create a 5-slide pitch deck about AI agents
+```
+
+The `/build-slides` skill will generate an HTML file and save it (usually to your downloads or a specified output directory).
+
+### Step 3: Evaluate the Generated Slides
 
 ```bash
-npm run eval:auto -- --prompts custom-evals mcp-connector-ecosystem
+npm run eval:auto -- --html-path /path/to/generated-slides.html
 ```
 
 That's it! The system will:
 - Load your stored configuration
-- Generate slides using the build-slides skill
-- Automatically evaluate them
+- Automatically evaluate the HTML slides using your rubric
 - Store results in a consolidated report
 
 ---
@@ -59,14 +64,14 @@ That's it! The system will:
 # Configure your API (one-time setup)
 npm run eval:setup
 
-# Run evaluation with inline prompt
-npm run eval:auto -- --prompt "Create a pitch deck about AI"
+# Evaluate generated slides (minimal)
+npm run eval:auto -- --html-path /path/to/slides.html
 
-# Run evaluation from prompt set
-npm run eval:auto -- --prompts custom-evals mcp-connector-ecosystem
+# Evaluate with prompt name and text (for better reporting)
+npm run eval:auto -- --html-path /path/to/slides.html --prompt-name "my-pitch" --prompt-text "Create a pitch deck"
 
 # View debug output
-npm run eval:dev -- --prompts custom-evals mcp-connector-ecosystem
+npm run eval:dev -- --html-path /path/to/slides.html
 ```
 
 ---
@@ -108,14 +113,22 @@ For Anthropic, use: `claude-opus-4-6`, `claude-3-5-sonnet-20241022`, etc.
 
 ---
 
+## Workflow
+
+1. **Create slides** — Use the `/build-slides` skill to generate HTML presentations
+2. **Evaluate** — Run `npm run eval:auto -- --html-path <path>` to evaluate
+3. **Review** — Check `EVALUATIONS.md` for scores and history
+
+This ensures you're evaluating actual skill output, not a programmatic approximation.
+
 ## For Customers
 
 This setup is designed for customer ease of use:
 
-1. **One-time configuration** — Set it once, forget about it
-2. **Secure storage** — Credentials stored locally, not in scripts or environment
-3. **Flexible providers** — Choose Anthropic or OpenRouter based on your needs
-4. **CI/CD ready** — Still supports environment variables for automation
+1. **Evaluate real skill output** — Test actual `/build-slides` skill quality
+2. **One-time configuration** — Set it once, forget about it
+3. **Secure storage** — Credentials stored locally, not in scripts or environment
+4. **Flexible providers** — Choose Anthropic or OpenRouter based on your needs
 5. **No manual key management** — No `export` commands needed
 
 ---
