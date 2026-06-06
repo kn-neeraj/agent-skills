@@ -5,11 +5,9 @@
  * from natural language prompts.
  */
 
-const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
-
-const client = new Anthropic();
+const { createClient, getModel } = require('./config-loader');
 
 /**
  * Call the build-slides skill to generate HTML presentation
@@ -40,8 +38,11 @@ When given a prompt, you will:
 Output ONLY the complete HTML code, nothing else. The HTML should be fully functional and self-contained.`;
 
   try {
+    const client = createClient();
+    const model = getModel();
+
     const response = await client.messages.create({
-      model: 'claude-opus-4-6',
+      model,
       max_tokens: 8000,
       system: systemPrompt,
       messages: [

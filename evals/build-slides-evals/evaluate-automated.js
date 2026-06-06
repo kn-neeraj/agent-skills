@@ -21,6 +21,7 @@ const { autoEvaluate } = require('./lib/auto-evaluator');
 const { initializeReport, addEvaluation, getNextEvaluationNumber, generateSummary } = require(
   './lib/consolidated-reporter'
 );
+const { getProvider, getModel } = require('./lib/config-loader');
 
 const RESULTS_DIR = path.join(__dirname, 'results');
 const EVALUATIONS_REPORT = path.join(RESULTS_DIR, 'EVALUATIONS.md');
@@ -78,11 +79,17 @@ async function main() {
   log.header('Build Slides Skill - Automated Evaluation Pipeline');
 
   try {
+    // Show configuration
+    const provider = getProvider();
+    const model = getModel();
+    log.info(`Using ${provider} • Model: ${model}\n`);
+
     // Validate input
     if (!args.prompt && !args.promptSet) {
       log.error('Usage:');
       log.info('  npm run eval:auto -- --prompt "Your prompt text"');
       log.info('  npm run eval:auto -- --prompts <set-name> <prompt-name>');
+      log.info('\nFirst time? Run: npm run eval:setup');
       process.exit(1);
     }
 

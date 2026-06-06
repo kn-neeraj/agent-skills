@@ -1,138 +1,130 @@
-# Evaluation System Setup
-
-Automated evaluation for the HTML Slides skill with vision-based scoring and report generation.
+# Setup Guide
 
 ## Quick Start
 
-### 1. Install Dependencies
+The evaluation system uses a **one-time setup** to configure your API credentials. No need to manage environment variables!
+
+### Step 1: Configure Your API
 
 ```bash
-cd evals
-npm install
+npm run eval:setup
 ```
 
-### 2. Configure API Key
+This will prompt you to:
+1. **Choose your API provider**
+   - Anthropic (claude.anthropic.com)
+   - OpenRouter (openrouter.ai)
+2. **Enter your API key**
+3. **Select a model** (or use defaults)
+
+Your configuration is saved to `.evalrc.json` (automatically ignored by git).
+
+### Step 2: Run Evaluations
 
 ```bash
-cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY
+npm run eval:auto -- --prompts custom-evals mcp-connector-ecosystem
 ```
 
-### 3. Run Evaluation
+That's it! The system will:
+- Load your stored configuration
+- Generate slides using the build-slides skill
+- Automatically evaluate them
+- Store results in a consolidated report
+
+---
+
+## Supported Providers
+
+### Anthropic
+
+- **Get API key:** https://console.anthropic.com/account/keys
+- **Default model:** `claude-opus-4-6`
+- **Alternative models:** `claude-3-5-sonnet-20241022`, etc.
+
+### OpenRouter
+
+- **Get API key:** https://openrouter.ai/keys
+- **Model format:** `openrouter/anthropic/claude-opus-4-6` or `anthropic/claude-3.5-sonnet`
+- **Benefits:**
+  - Load balancing across multiple providers
+  - Fallback models if primary is unavailable
+  - Unified API for testing multiple models
+  - See all available models: https://openrouter.ai/docs/models
+
+---
+
+## Commands
 
 ```bash
-npm run eval
+# Configure your API (one-time setup)
+npm run eval:setup
+
+# Run evaluation with inline prompt
+npm run eval:auto -- --prompt "Create a pitch deck about AI"
+
+# Run evaluation from prompt set
+npm run eval:auto -- --prompts custom-evals mcp-connector-ecosystem
+
+# View debug output
+npm run eval:dev -- --prompts custom-evals mcp-connector-ecosystem
 ```
 
-This will:
-1. Generate slides for all 18 prompts in dataset.json
-2. Capture screenshots of each slide set
-3. Score using Claude's vision API
-4. Generate a markdown report with metrics
+---
 
-## Output
+## Configuration File
 
-Results are saved in `results/run-[timestamp]/`:
+Your configuration is stored in `.evalrc.json` (git-ignored):
 
-```
-results/run-2024-05-30T120000-000Z/
-├── RESULTS.md              # Human-readable report
-├── results.json            # Raw scores and data
-└── screenshots/            # Generated screenshots
-    ├── pitch_tech_startup/
-    │   ├── slide-1.png
-    │   ├── slide-2.png
-    │   └── slide-3.png
-    └── ... (other prompts)
+```json
+{
+  "provider": "openrouter",
+  "apiKey": "sk_or_xxxxxxxxxxxxx",
+  "model": "openrouter/anthropic/claude-opus-4-6",
+  "createdAt": "2026-06-06T14:30:22.000Z"
+}
 ```
 
-## Report Format
+To reconfigure later, run `npm run eval:setup` again.
 
-The generated RESULTS.md includes:
-
-- **Summary table** - Overall metrics and pass rates
-- **Individual scores** - Readability, composition, consistency for each prompt
-- **Category breakdown** - Performance by category (business, educational, edge cases)
-- **Strengths** - Prompts scoring 4.5+ (visual quality)
-- **Improvements** - Prompts scoring <3.5
-- **Functionality issues** - Any broken navigation/interaction
-- **Insights** - Per-criteria analysis
-
-## Dataset
-
-18 evaluation prompts covering:
-- Business pitches (tech startup, sales deck)
-- Educational content (Python, climate, workshops)
-- Product/marketing (roadmap, demo, campaign)
-- Edge cases (long titles, text-heavy, minimal briefs)
-
-See `dataset.json` for all prompts.
-
-## Rubric
-
-Vision-based scoring on 4 criteria (1-5 scale each):
-
-1. **Readability** - Text clarity, hierarchy, sizing, contrast
-2. **Composition** - Layout balance, whitespace, positioning
-3. **Consistency** - Visual uniformity across slides
-4. **Functionality** - Navigation and keyboard controls working
-
-See `rubric.md` for detailed scoring criteria.
-
-## Metrics Tracked
-
-- **Visual Quality Score** = (Readability + Composition + Consistency) / 3
-- **Functionality Pass Rate** = % of prompts with working navigation
-- **Average by Category** = Performance breakdown by content type
-- **Failure Rate** = % of evaluations that errored
-
-## Running Multiple Times
-
-Each run creates a timestamped directory:
-- `run-2024-05-30T120000-000Z/`
-- `run-2024-05-30T130000-000Z/`
-- etc.
-
-Compare results across runs to detect regressions.
+---
 
 ## Troubleshooting
 
-### "Module not found: @anthropic-ai/sdk"
-```bash
-npm install
-```
+### "Configuration file not found"
 
-### "ANTHROPIC_API_KEY not set"
-- Create `.env` file (copy from `.env.example`)
-- Add your API key
+Run `npm run eval:setup` to create your configuration.
 
-### "Playwright installation failed"
-```bash
-npx playwright install
-```
+### "Invalid API key"
 
-### "Invalid HTML generated"
-- Check Claude API is responding correctly
-- Verify build-slides SKILL.md is readable
-- Check prompt format in dataset.json
+Make sure your API key is correct. Get a new one from:
+- Anthropic: https://console.anthropic.com/account/keys
+- OpenRouter: https://openrouter.ai/keys
 
-## Development
+### "Model not found"
 
-Debug mode:
-```bash
-npm run eval:dev
-```
+For OpenRouter, verify the model name at: https://openrouter.ai/docs/models
 
-## Customization
+For Anthropic, use: `claude-opus-4-6`, `claude-3-5-sonnet-20241022`, etc.
 
-### Add new prompts
-Edit `dataset.json` and add to the `prompts` array.
+---
 
-### Modify scoring criteria
-Edit the rubric in `rubric.md` and update `SCORING_PROMPT` in `lib/scorer.js`.
+## For Customers
 
-### Change screenshot count
-Edit `lib/screenshotter.js` - modify which slides are captured (first, middle, last).
+This setup is designed for customer ease of use:
 
-### Add new metrics
-Edit `lib/report-generator.js` to calculate and display additional metrics.
+1. **One-time configuration** — Set it once, forget about it
+2. **Secure storage** — Credentials stored locally, not in scripts or environment
+3. **Flexible providers** — Choose Anthropic or OpenRouter based on your needs
+4. **CI/CD ready** — Still supports environment variables for automation
+5. **No manual key management** — No `export` commands needed
+
+---
+
+## Results
+
+After running an evaluation, check:
+
+- **Master Report:** `results/EVALUATIONS.md`
+- **Generated HTML:** `results/<prompt-name>-<timestamp>.html`
+
+View the HTML files in your browser to see the generated slides. Check EVALUATIONS.md for the consolidated evaluation history with all scores and timestamps.

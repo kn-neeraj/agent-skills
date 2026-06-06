@@ -6,11 +6,9 @@
  * Uses the existing eval judge (scorer.js) and rubric.md
  */
 
-const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
-
-const client = new Anthropic();
+const { createClient, getModel } = require('./config-loader');
 
 // Load the existing rubric
 const RUBRIC_PATH = path.join(__dirname, '../rubric.md');
@@ -28,6 +26,9 @@ async function autoEvaluate(htmlPath, promptText, promptName) {
   console.log('  🔍 Evaluating slides using eval judge...');
 
   try {
+    const client = createClient();
+    const model = getModel();
+
     // Read the HTML content
     const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
 
@@ -57,7 +58,7 @@ Respond ONLY with valid JSON (no markdown, no explanation):
 }`;
 
     const response = await client.messages.create({
-      model: 'claude-opus-4-6',
+      model,
       max_tokens: 500,
       messages: [
         {
