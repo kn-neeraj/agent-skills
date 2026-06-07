@@ -1,6 +1,6 @@
 # Agent Skills
 
-A collection of reusable AI agent skills for code generation, session memory, and productivity.
+A collection of reusable AI agent skills, commands, and tools I use acrsss projects. for code generation, session memory, and productivity. More skills and commands are added continuously as new projects and workflows emerge.
 
 ## Available Skills and Commands
 
