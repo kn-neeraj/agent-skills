@@ -16,6 +16,8 @@ When Claude Code detects this `CLAUDE.md` file, it should:
 Skills are organized in subdirectories:
 
 - `build-slides/` - Presentation slide generation
+- `summarise/` - Session summary generation
+- `read-sessions-summary/` - Read and browse session summaries
 
 ## Usage
 
