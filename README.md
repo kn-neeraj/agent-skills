@@ -7,6 +7,8 @@ A collection of reusable AI agent skills for Claude.ai, Claude Code, and Claude 
 | Skill | What it does | Claude.ai | Claude Code | Cowork |
 |-------|-------------|-----------|-------------|--------|
 | build-slides | Generate presentation slides with structured formats and themes | [Download .skill](./build-slides/build-slides.skill) | `/build-slides` | `@build-slides` |
+| summarise | Summarise the current session and save to docs/sessions/ | N/A | `/summarise` | `@summarise` |
+| read-sessions-summary | Read and browse session summaries from docs/sessions/ | N/A | `/read-sessions-summary` | `@read-sessions-summary` |
 
 ## Installation
 
