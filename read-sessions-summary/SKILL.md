@@ -56,7 +56,7 @@ Build a browsable index and present it to the user:
 
 | Date | Title | Files Touched | Short Summary |
 |------|-------|---------------|---------------|
-| 2024-06-07 | JWT Authentication Refactor | src/auth.ts | Refactored JWT auth to RS256 with 15-min expiry |
+| 2024-06-07 | JWT Authentication Refactor | src/auth.ts | Refactored JWT auth to RS256... |
 | 2024-06-05 | OAuth Redirect Fix | src/oauth.ts | Fixed broken redirect after Google login |
 ```
 
