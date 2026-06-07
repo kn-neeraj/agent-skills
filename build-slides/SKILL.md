@@ -1,316 +1,480 @@
 # Build Slides Skill
+**Generate professional presentations with locked design, validated content, and structured slides.**
 
-Generate professional presentation slides with golden ratio typography, visual consistency, interactive features, and data visualizations.
-
-## CRITICAL REQUIREMENTS
-
-**These must be followed EXACTLY to generate working slides:**
-
-1. **Self-contained HTML**: NO external CDN fonts or dependencies. Use system fonts only (Arial, Helvetica, Verdana, Georgia, monospace)
-2. **Works offline**: All HTML must work when opened as `file://` without a web server
-3. **Proper slide initialization**:
-   - ONLY the first slide has `class="slide active"`
-   - All other slides have `class="slide"` (no active class)
-   - Theme switcher has `class="theme-switcher"` (NO active class by default)
-4. **JavaScript initialization**: Must run immediately without errors
-5. **Text visibility**: All text must be visible with proper contrast
-
-## Skill Orchestration
-
-**Agent workflow for generating slides:**
-
-1. **Read Input Files** (in order)
-   - `slide-content.md` — Customer-provided markdown in slide-by-slide format
-   - `components.md` — Structure definitions (Title, Basic, Two-Column, Chart Layout)
-   - `styles.md` — Quality systems to apply (typography, spacing, shadows, alignment, colors, themes)
-
-2. **Parse slide-content.md**
-   - Extract slides: look for `## Slide N: [structure-type]` headers
-   - Extract content: bullets and details under each slide
-   - Identify structure type for each slide (title-slide, basic, two-column, chart-layout)
-   - Handle special syntax: `### Left:` / `### Right:` for two-column, `[CHART: type]` for charts
-
-3. **Apply components.md structure to each slide**
-   - Title Slide: Center layout with title, subtitle, description
-   - Basic: Title + content area (85% max-width, center-aligned)
-   - Two-Column: Title + two equal columns with 30px gap
-   - Chart Layout: Title + chart container + text area
-
-4. **Apply styles.md quality systems**
-   - Typography: Use golden ratio (1.618) formula from selected theme
-   - Text alignment: Center-align all text by default (unless override specified)
-   - Spacing: Apply 8px scale margins and padding per structure
-   - Colors: Use theme colors (primary, secondary, accent, text)
-   - Shadows: Apply shadow hierarchy for interactive elements
-   - Corner radius: Use theme-specific radius (Modern: 6px, Classic: 4px, Bold: 8px)
-   - **Font families: Use system fonts ONLY** (no Google Fonts or CDN)
-
-5. **Generate HTML**
-   - Create self-contained HTML with inline CSS and JavaScript
-   - Include navigation controls, keyboard support, speaker notes
-   - Apply all quality systems from styles.md
-   - Ensure responsive design (320px+) and print-friendly CSS
-   - **NO external resources**: All CSS/JS inline, system fonts only
-
-## Input Format
-
-**Customer provides:** `slide-content.md` markdown file in slide-by-slide format
-
-```markdown
-# Presentation Title
+This skill is designed for LLM agents to create high-quality PPTs by guiding users through a three-gate workflow: Style Selection → Content Development → Structure Confirmation → HTML Generation.
 
 ---
 
-## Slide 1: [Structure Type]
-- Title: [Slide title]
-- [Content details]
+## 🏗️ Three-Layer Architecture
+
+This skill uses three external catalogs:
+
+### Layer 1: PPT Styles (`ppt-styles.md`)
+Define complete design systems - locked colors, fonts, spacing, everything.
+
+**Available styles:**
+- Modern: Blue, clean, tech-forward (47px H1, 6px radius)
+- Classic: Navy, professional, trustworthy (42px H1, 4px radius)
+- Bold: Red, striking, high-impact (53px H1, 8px radius)
+
+**Agent's role:** Choose the style that best fits the topic/audience.
 
 ---
 
-## Slide 2: [Structure Type]
-- Title: [Slide title]
-- [Content details]
+### Layer 2: Components Catalog (`components-catalog.md`)
+Define reusable building blocks: text, lists, charts, tables, code, flows.
+
+**Available components:**
+- Text: Title, Subtitle, Body, Footer
+- Lists: Bullet, Numbered, Nested
+- Data: Chart, Table, Cards
+- Code: Code Snippet
+- Flow: Steps, Timeline
+
+**Agent's role:** Reference this catalog when mapping content to slide structures.
 
 ---
-```
 
-**Format rules:**
-- Each slide starts with `## Slide N: [Structure Type]`
-- Structure types: title-slide, basic, two-column, chart-layout
-- List content with bullets under each slide
-- Separate slides with `---`
-- For two-column: Use `### Left:` and `### Right:` headers
-- For chart-layout: Use `[CHART: type]` followed by data
-- Simple and readable — customer iterates, agent regenerates HTML
+### Layer 3: Slide Structures (`slide-structures.md`)
+Define slide templates that combine components.
+
+**Available structures:**
+- Title Slide (title + subtitle + footer)
+- Information Slide (title + text + list)
+- Two-Column Slide (title + left/right columns)
+- Data Slide (title + chart + text)
+- Table Slide (title + table + text)
+- Process Slide (title + steps)
+- Timeline Slide (title + timeline)
+
+**Agent's role:** Map locked content to these structures.
+
+---
+
+## 🚪 Three-Gate Workflow
+
+### Gate 1: Style Selection
+**What happens:** Agent proposes a PPT style. User validates.
+
+**Agent's task:**
+1. Read user's request (topic, tone, audience)
+2. Review `ppt-styles.md`
+3. Propose a style: "I recommend PPT Style: Modern because [reason]"
+4. Explain why this style fits: "This style works well for [topic] because [reason]"
+
+**User's task:**
+- Review the proposed style
+- Confirm or request a different style
+- Once confirmed → **Design is LOCKED** ✅
+
+**Outcome:** All design decisions are now fixed (colors, fonts, spacing, corner radius, shadows).
 
 **Example:**
-```markdown
-# Ladder of AI Knowledge
-
----
-
-## Slide 1: title-slide
-- Title: Ladder of AI Knowledge
-- Subtitle: From Applied AI to Hardware
-- Description: Understanding the complete AI stack
-
----
-
-## Slide 2: basic
-- Title: The Four Rungs
-- Content listed with bullets
-
----
-
-## Slide 3: two-column
-- Title: Comparison
-- Left Column Header: Option A
-  - Point 1
-  - Point 2
-- Right Column Header: Option B
-  - Point 1
-  - Point 2
-
----
-
-## Slide 4: chart-layout
-- Title: Performance Metrics
-- [CHART: bar]
-  - Label 1: value 1
-  - Label 2: value 2
-- Chart explanation text
-
----
+```
+Agent: "For a technical comparison like MCP vs CLI, I recommend Modern style -
+        it's clean and tech-forward."
+User: "Yes, that works for me."
+→ Design LOCKED. Modern colors, fonts, spacing now fixed.
 ```
 
-**Workflow:**
-- Customer edits markdown anytime
-- Agent reads slide-content.md
-- Agent regenerates HTML automatically
-- All quality systems applied from styles.md
+---
 
-## Workflow
+### Gate 2: Content Development
+**What happens:** Agent works WITH user to develop and validate content.
 
-1. **Understand Requirements**
-   - Parse user request for topic, slide count, theme preference
-   - Identify target audience and context
+**Agent's task:**
+1. Ask user: "What should each slide say?"
+2. Help user think through the message:
+   - "Does this cover what you want to communicate?"
+   - "Should we add/remove/clarify anything?"
+   - "Is this order logical?"
+3. Work iteratively until user is satisfied
 
-2. **Select Theme**
-   - Choose from 3 themes: Modern, Classic, Bold (see styles.md)
-   - Applies typography, colors, spacing system throughout
+**User's task:**
+- Provide content ideas/information
+- Review proposed content
+- Refine until ready
+- Confirm: "Content is ready"
+- Once confirmed → **Content is LOCKED** ✅
 
-3. **Read Instruction Files**
-   - Read `slide-content.md` for content and structure markers
-   - Read `components.md` for structure definitions
-   - Read `styles.md` for quality systems to apply
+**Outcome:** All slide content is finalized. No more changes to what will be said.
 
-4. **Generate HTML**
-   - Parse slide-content.md structure markers
-   - Apply components.md layout for each structure
-   - Apply styles.md quality systems (typography, spacing, alignment, colors)
-   - Include navigation, keyboard support, speaker notes
-   - Include theme system JavaScript (THEMES constant, applyTheme function)
-   - Include theme switcher overlay HTML
-   - Include theme switcher CSS
-   - Add theme button to navigation bar
-   - Call initThemeSystem() in init()
+**Example:**
+```
+Agent: "For your MCP vs CLI presentation, I suggest:
+        - Slide 1: Title slide
+        - Slide 2: Architecture comparison
+        - Slide 3: Use cases
+        - Slide 4: Adoption trends (with chart)
+        - Slide 5: Key differences
+        - Slide 6: Conclusion
 
-6. **Add Visualizations**
-   - Implement charts using Chart.js patterns (see assets/chart-patterns.md)
-   - Use chart color injection helper to automatically inherit theme colors
-   - Choose appropriate chart type for data
-   - Ensure charts fit within slide padding boundaries and respect margins from components.md
-
-7. **Assemble Output**
-   - Combine HTML structure, content, styles, and scripts
-   - Verify all interactive features functional
-   - Test navigation, keyboard shortcuts, notes toggle
-   - Ensure mobile responsive (320px+) and print-friendly
-
-## Architecture Rules
-
-- One slide per output block
-- Use HTML/CSS for slide structure
-- Embed Chart.js for data visualizations
-- Self-contained: no external dependencies
-- Mobile-responsive layouts
-
-## Output Format
-
-Generate slides as HTML files:
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Presentation Title</title>
-  <style>/* Theme styles */</style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-  <div class="slide"><!-- Slide 1 --></div>
-  <div class="slide"><!-- Slide 2 --></div>
-  <!-- ... -->
-</body>
-</html>
+        Does this cover what you want to say?"
+User: "Yes, but can we swap slides 3 and 4?"
+Agent: "Sure, updated. Anything else?"
+User: "No, this is ready."
+→ Content LOCKED. No more content changes.
 ```
 
-## QA Checklist
+---
 
-Before delivering slides, verify:
+### Gate 3: Structure Confirmation
+**What happens:** Agent proposes slide structure. User confirms arrangement.
 
-**Content & Format**
-- [ ] All slides follow selected format template
-- [ ] Slide count matches user request
-- [ ] No lorem ipsum or placeholder text
-- [ ] Speaker notes included where needed
-- [ ] Each slide uses appropriate structure from components.md (Title, Basic, Two-Column, Chart Layout)
-- [ ] Content is organized logically within chosen structures
-- [ ] Margins and spacing match components.md guidelines (no random padding)
+**Agent's task:**
+1. Read `components-catalog.md` and `slide-structures.md`
+2. For each locked content item, choose:
+   - Which slide structure best fits (title, info, two-column, data, etc.)
+   - Which components from catalog to use
+3. Propose: "I'll arrange your content like this:
+   - Slide 1: Title Slide (Title + Subtitle + Footer)
+   - Slide 2: Two-Column Slide (Title + Left Column + Right Column)
+   - etc."
+4. Explain reasoning: "This structure works because [reason]"
 
-**Quality Systems**
-- [ ] Golden ratio typography applied (H1 → H2 → H3 → body hierarchy from formula)
-- [ ] **NO Google Fonts or external CDN** - system fonts only
-- [ ] Spacing uses 8px scale (no arbitrary pixel values)
-- [ ] Shadow hierarchy visible (subtle on cards, medium on floating elements)
-- [ ] Corner radius consistent across elements
+**User's task:**
+- Review the proposed slide structure
+- Confirm or suggest changes:
+  - "Should slide 2 come before slide 3?"
+  - "Should I use a chart instead of a table here?"
+- Agent adjusts and confirms again
+- Once satisfied → **Structure is LOCKED** ✅
 
-**Initialization & HTML Structure**
-- [ ] **ONLY first slide has `class="slide active"`** - all others have `class="slide"` only
-- [ ] **Theme switcher has NO class by default** - `class="theme-switcher"` (not `.active`)
-- [ ] All CSS is inlined in `<style>` tag
-- [ ] All JavaScript is inlined in `<script>` tag
-- [ ] No external script/link tags (except Chart.js if needed)
+**Outcome:** Slide arrangement is finalized. Agent now knows exactly which structure each slide uses.
 
-**Features**
-- [ ] Navigation controls visible (prev/next buttons, counter, progress bar)
-- [ ] Keyboard shortcuts work (arrows, space, F, ESC, N)
-- [ ] Notes panel toggles and displays current slide notes
-- [ ] Button hover effects visible (lift + shadow)
-- [ ] Focus indicators visible with keyboard navigation
-- [ ] Slide transitions smooth (fade, ≤300ms)
-- [ ] **All text is visible** - proper color contrast on first load
+**Example:**
+```
+Agent: "Based on your locked content, here's my slide structure:
+        - Slide 1: Title Slide
+        - Slide 2: Two-Column Slide (CLI vs MCP)
+        - Slide 3: Two-Column Slide (Use cases)
+        - Slide 4: Data Slide (Chart showing adoption)
+        - Slide 5: Information Slide (Key differences as list)
+        - Slide 6: Title Slide (Conclusion)
 
-**Data & Visualizations**
-- [ ] Charts render correctly with theme colors auto-injected
-- [ ] Charts responsive (fit within slide width, no overflow)
-- [ ] Sample data is realistic or actual data provided
-
-**Responsive & Accessibility**
-- [ ] Mobile responsive (320px viewport readable, 44px touch targets)
-- [ ] Print-friendly (controls hidden, page breaks between slides)
-- [ ] **Works with `file://` protocol** - no console errors
-- [ ] **Works offline** - no external resources required
-
-## JavaScript Initialization Rules
-
-**CRITICAL**: The first slide MUST be visible immediately when page loads.
-
-```javascript
-// At the VERY END of <script>, call:
-let currentSlide = 1;
-showSlide(currentSlide);
-
-function showSlide(n) {
-  const slides = document.querySelectorAll('.slide');
-  slides.forEach(s => s.classList.remove('active', 'prev'));
-  slides[n - 1].classList.add('active');
-  if (n > 1) slides[n - 2].classList.add('prev');
-  // Update UI...
-}
+        Does this arrangement work?"
+User: "Looks good!"
+→ Structure LOCKED. Agent now knows exact slide types and components.
 ```
 
-**DO NOT:**
-- Add `.active` class to theme-switcher on load
-- Call `selectTheme()` before `showSlide()`
-- Use localStorage defaults that trigger theme changes
+---
 
-**DO:**
-- Initialize slides FIRST
-- Show first slide FIRST
-- Then handle theme/notes
+### Execution: HTML Generation
+**What happens:** Agent generates presentation HTML using all three locked things.
 
-## HTML Structure Rules
+**Everything is now locked:**
+- ✅ Design (from Gate 1: colors, fonts, spacing)
+- ✅ Content (from Gate 2: what will be said)
+- ✅ Structure (from Gate 3: how slides are arranged)
 
-**Slide divs MUST be formatted as:**
-```html
-<!-- Slide 1 - ONLY this slide has .active -->
-<div class="slide active" data-slide="1">
-  <h1>Title</h1>
-  <p>Content</p>
-</div>
+**Agent's task:**
+1. For each slide with locked content and locked structure:
+   - Apply locked style (colors, fonts, spacing from ppt-styles.md)
+   - Insert locked content (what user approved)
+   - Use locked structure (components from slide-structures.md)
+   - Generate HTML
+2. Add navigation, keyboard shortcuts
+3. Add Chart.js for visualizations
+4. Output: `presentation.html`
 
-<!-- Slide 2 - NO .active class -->
-<div class="slide" data-slide="2">
-  <h2>Title</h2>
-  <p>Content</p>
-</div>
+**Result:** High-quality, consistent, presentation-ready HTML file.
 
-<!-- Theme switcher - NO class by default -->
-<div class="theme-switcher" id="themeSwitcher">
-  <!-- theme cards -->
-</div>
+**User's task:**
+- View the generated HTML
+- Confirm: "Does this look good to present?"
+- ✅ Done! Ready to use.
+
+---
+
+## 📋 Agent Workflow Summary
+
+```
+1. UNDERSTAND REQUEST
+   ↓ User says: "Create a PPT about MCP vs CLI"
+
+2. GATE 1: STYLE
+   ├─ Agent: "I recommend Modern style"
+   ├─ User: "Yes"
+   └─ Design LOCKED ✅
+
+3. GATE 2: CONTENT
+   ├─ Agent: "For your topic, I suggest this content..."
+   ├─ User: Refines/approves content
+   └─ Content LOCKED ✅
+
+4. GATE 3: STRUCTURE
+   ├─ Agent: "I'll arrange it like this..."
+   ├─ User: Confirms arrangement
+   └─ Structure LOCKED ✅
+
+5. EXECUTE: GENERATION
+   ├─ Agent: Applies all three locked things
+   ├─ Agent: Generates presentation.html
+   └─ User: "Ready to present!"
 ```
 
-**NEVER:**
-- Add `class="active"` to theme-switcher on load
-- Add `class="prev"` to any slide in HTML (only add via JavaScript)
-- Use `class="title-slide active prev"` - use single class where needed
+---
 
-## Error Handling
+## 🎯 Key Principles
 
-If requirements are unclear:
-- Ask for clarification on topic or format
-- Suggest format based on content type
-- Default to clean, minimal theme
+### Design Decisions are Locked
+Once a style is chosen:
+- ❌ Cannot change colors
+- ❌ Cannot change fonts
+- ❌ Cannot change spacing
+- ❌ Cannot change typography sizes
+- ✅ Everything is consistent and professional
 
-If chart data is needed but not provided:
-- Use realistic sample data
-- Note in speaker notes that data should be updated
-- Provide instructions for data updates
+### Content is Locked
+Once content is approved:
+- ❌ Cannot change what will be said
+- ✅ Only structure can change (slide arrangement)
 
-**If generated HTML shows blank/empty slides:**
-- Check that first slide has `class="slide active"`
-- Check that all text colors have sufficient contrast
-- Check that theme-switcher does NOT have `.active` class on load
-- Verify no JavaScript errors in console
+### Structure is Locked
+Once structure is confirmed:
+- ❌ Cannot change slide types
+- ❌ Cannot change component arrangements
+- ✅ Generation is purely mechanical
+
+### Generation is Deterministic
+Once everything is locked:
+- Input: Locked style + locked content + locked structure
+- Process: Apply specifications to content
+- Output: Always high-quality, consistent HTML
+
+---
+
+## 📚 How to Use the Three Catalogs
+
+### `ppt-styles.md` - Use at Gate 1
+```
+Agent reads ppt-styles.md
+    ↓
+Agent selects one: Modern | Classic | Bold
+    ↓
+Agent proposes to user
+    ↓
+User confirms
+    ↓
+Style LOCKED
+```
+
+### `components-catalog.md` - Reference at Gate 3
+```
+Agent reads components-catalog.md
+    ↓
+Agent understands: "Which components are available?"
+    ↓
+Agent uses components when mapping content to structures
+    ↓
+Agent generates HTML that uses components correctly
+```
+
+### `slide-structures.md` - Use at Gate 3
+```
+Agent reads slide-structures.md
+    ↓
+Agent decides: "For this content, which structure fits best?"
+    ↓
+Agent proposes structure to user
+    ↓
+User confirms
+    ↓
+Structure LOCKED
+    ↓
+Agent generates HTML using locked structure
+```
+
+---
+
+## ✨ Self-Contained HTML Requirements
+
+**All generated HTML must be:**
+
+1. **Self-contained** - NO external dependencies
+   - ❌ No external fonts (no Google Fonts CDN)
+   - ❌ No external stylesheets
+   - ❌ All CSS inlined
+   - ❌ All JavaScript inlined
+   - ✅ Exception: Chart.js from CDN only (essential for charts)
+
+2. **Offline-capable** - Works with `file://` protocol
+   - ❌ No external resources
+   - ✅ Can open directly in browser without web server
+   - ✅ All fonts are system fonts (Arial, Helvetica, Georgia, Verdana, monospace)
+
+3. **Proper initialization**
+   - ✅ ONLY first slide has `class="slide active"`
+   - ✅ All other slides have `class="slide"` only
+   - ✅ JavaScript runs immediately and shows first slide
+   - ✅ No timing issues, no disappearing text
+
+4. **Text visibility**
+   - ✅ All text is visible on page load
+   - ✅ Proper color contrast (from locked style)
+   - ✅ Readable font sizes (from locked style)
+   - ✅ Appropriate line-height and spacing
+
+5. **Responsive design**
+   - ✅ Works on mobile (320px+)
+   - ✅ Works on desktop (1920px+)
+   - ✅ Touch-friendly button sizes (44px+)
+
+---
+
+## 🎨 Example Workflow
+
+**User Request:** "Create a 5-slide PPT about MCP vs CLI"
+
+### Gate 1: Style
+```
+Agent: "For a technical comparison, I recommend Modern style -
+        it's clean, professional, and tech-forward."
+User: "Sounds good!"
+→ Design LOCKED: Blue primary, clean layout, 47px headings
+```
+
+### Gate 2: Content
+```
+Agent: "Let's outline your slides:
+        1. Title slide - MCP vs CLI
+        2. Architecture comparison - CLI vs MCP
+        3. Use cases - when to use each
+        4. Adoption trends - chart showing growth
+        5. Key differences - as a list
+
+        Does this cover what you want to say?"
+User: "Yes, let's add more on security in slide 5"
+Agent: "Updated. Anything else?"
+User: "No, ready!"
+→ Content LOCKED: All 5 slides have finalized content
+```
+
+### Gate 3: Structure
+```
+Agent: "I'll structure your slides like this:
+        1. Title Slide (Title + Subtitle + Footer)
+        2. Two-Column Slide (CLI vs MCP comparison)
+        3. Two-Column Slide (CLI use cases vs MCP use cases)
+        4. Data Slide (Bar chart of adoption 2023-2025)
+        5. Information Slide (List of key differences)
+
+        Does this arrangement work?"
+User: "Perfect!"
+→ Structure LOCKED: Agent knows exact structure for each slide
+```
+
+### Execution: Generation
+```
+Agent generates HTML:
+├─ Applies Modern style (blue colors, 47px titles, etc.)
+├─ Inserts locked content (what user approved)
+├─ Uses locked structures (components from catalog)
+├─ Adds navigation, keyboard shortcuts
+├─ Includes Chart.js for slide 4's bar chart
+└─ Output: presentation.html
+
+User opens file in browser:
+"This looks great! I can present this."
+```
+
+---
+
+## ✅ QA Checklist - Before Delivering HTML
+
+**Content & Structure**
+- [ ] All slides follow their assigned structure
+- [ ] Each component has required fields filled
+- [ ] Content matches what user approved
+- [ ] Data in charts/tables is accurate
+- [ ] All slides are present and ordered correctly
+
+**Style & Design**
+- [ ] Colors match selected PPT style
+- [ ] Font families are system fonts only (Arial, Helvetica, Georgia, Verdana)
+- [ ] Font sizes match golden ratio from style
+- [ ] Spacing follows 8px scale from style
+- [ ] Corner radius matches style (6px, 4px, or 8px)
+- [ ] Text alignment is center (locked default)
+
+**HTML Structure**
+- [ ] ONLY first slide has `class="slide active"`
+- [ ] All other slides have `class="slide"` only
+- [ ] All CSS is inlined (no external stylesheets)
+- [ ] All JavaScript is inlined (no external scripts)
+- [ ] Chart.js is only external resource (if used)
+
+**Features & Functionality**
+- [ ] Navigation buttons work (Previous/Next)
+- [ ] Keyboard shortcuts work (arrow keys, space)
+- [ ] Progress bar updates correctly
+- [ ] Slide counter shows correct numbers
+- [ ] Charts render correctly with locked style colors
+- [ ] All text is visible on page load
+
+**Offline & Compatibility**
+- [ ] Works when opened with `file://` protocol (no web server needed)
+- [ ] Works in modern browsers (Chrome, Firefox, Safari, Edge)
+- [ ] No console errors
+- [ ] Responsive on mobile (320px+) and desktop (1920px+)
+
+---
+
+## 🚀 When to Use This Skill
+
+✅ **Use this skill when:**
+- Creating presentations from scratch
+- Need consistent, professional-looking slides
+- Want design decisions locked in
+- User wants to focus on content, not styling
+- Need self-contained HTML (no external dependencies)
+
+❌ **Don't use this skill when:**
+- Editing existing presentations (use design tools instead)
+- Need custom fonts or colors beyond the three styles
+- Need complex animations or effects
+- Generating documents (not presentations)
+
+---
+
+## 📞 How Users Experience This
+
+**User perspective:**
+1. "Create a PPT about [topic]"
+2. Agent suggests a style → I confirm
+3. Agent helps me write/refine content → I approve
+4. Agent shows me how slides will be arranged → I confirm
+5. Agent generates HTML → I open and present
+
+**User doesn't need to know about:**
+- ❌ Component catalog (agent handles it)
+- ❌ Slide structures (agent handles it)
+- ❌ Style specifications (locked once chosen)
+- ❌ HTML generation details (agent does it)
+
+**User only cares about:**
+- ✅ Content (is this what I want to say?)
+- ✅ Final look (does this look good to present?)
+
+---
+
+## 🎓 Key Takeaway
+
+**This skill guides agents through a three-gate process:**
+
+1. **Gate 1: Style** - Lock design (choose from 3 complete styles)
+2. **Gate 2: Content** - Lock content (work with user to develop it)
+3. **Gate 3: Structure** - Lock structure (map content to slide types)
+4. **Execute** - Generate HTML using all three locked things
+
+**Result:** High-quality, consistent, presentation-ready slides every time.
+
+---
+
+## 📂 Related Files
+
+- `ppt-styles.md` - Complete design systems (colors, fonts, spacing)
+- `components-catalog.md` - Reusable building blocks (15+ components)
+- `slide-structures.md` - Slide templates (7 core structures)
+- `assets/chart-patterns.md` - Chart.js code patterns
+- `examples/mcp-vs-cli.html` - Working example presentation
