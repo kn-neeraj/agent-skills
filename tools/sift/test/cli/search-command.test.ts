@@ -11,7 +11,7 @@ describe('search-command', () => {
 
     it('should have query argument', () => {
       const command = createSearchCommand();
-      expect(command.args.length).toBe(1);
+      expect(command.registeredArguments.length).toBe(1);
     });
 
     it('should have --since option', () => {
@@ -30,6 +30,12 @@ describe('search-command', () => {
       const command = createSearchCommand();
       const limitOption = command.options.find((opt: any) => opt.long === '--limit');
       expect(limitOption!.defaultValue).toBe('5');
+    });
+
+    it('should have --debug option', () => {
+      const command = createSearchCommand();
+      const debugOption = command.options.find((opt: any) => opt.long === '--debug');
+      expect(debugOption).toBeDefined();
     });
   });
 });

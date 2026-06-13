@@ -11,7 +11,7 @@ describe('get-command', () => {
 
     it('should have slug argument', () => {
       const command = createGetCommand();
-      expect(command.args.length).toBe(1);
+      expect(command.registeredArguments.length).toBe(1);
     });
 
     it('should have correct description', () => {

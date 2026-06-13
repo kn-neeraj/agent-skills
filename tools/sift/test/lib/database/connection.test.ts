@@ -26,7 +26,7 @@ describe('database connection', () => {
   describe('getDatabase', () => {
     it('should create database directory and file', () => {
       const db = getDatabase();
-      const dbPath = path.join(os.homedir(), '.sift', 'index.sqlite');
+      const dbPath = path.join(process.env.HOME!, '.sift', 'index.sqlite');
       
       expect(fs.existsSync(dbPath)).toBe(true);
       expect(db.open).toBe(true);
@@ -67,7 +67,7 @@ describe('database connection', () => {
 
     it('should create database in user home directory', () => {
       const db = getDatabase();
-      const dbPath = path.join(os.homedir(), '.sift', 'index.sqlite');
+      const dbPath = path.join(process.env.HOME!, '.sift', 'index.sqlite');
       
       expect(dbPath).toContain(testDir);
       expect(fs.existsSync(dbPath)).toBe(true);

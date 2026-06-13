@@ -8,12 +8,14 @@ describe('index-command', () => {
   let testDir: string;
   let sessionsDir: string;
   const originalHome = process.env.HOME;
+  const originalCwd = process.cwd();
 
   beforeEach(() => {
     testDir = path.join(os.tmpdir(), `sift-test-${Date.now()}`);
     sessionsDir = path.join(testDir, 'docs', 'sessions');
     fs.mkdirSync(sessionsDir, { recursive: true });
     process.env.HOME = testDir;
+    process.chdir(testDir);
   });
 
   afterEach(() => {
@@ -21,6 +23,7 @@ describe('index-command', () => {
       fs.rmSync(testDir, { recursive: true, force: true });
     }
     process.env.HOME = originalHome;
+    process.chdir(originalCwd);
   });
 
   describe('createIndexCommand', () => {
@@ -76,6 +79,7 @@ Body content`;
       const processExitSpy = jest.spyOn(process, 'exit').mockImplementation();
 
       const wrongDir = path.join(testDir, 'wrong-path');
+      fs.mkdirSync(wrongDir, { recursive: true });
       process.chdir(wrongDir);
 
       const command = createIndexCommand();

@@ -17,7 +17,7 @@ Session body content here`;
       expect(result!.slug).toBe('test-session');
       expect(result!.date).toBe('2026-06-13');
       expect(result!.title).toBe('Test Session');
-      expect(result!.files_touched).toBe('["src/cli/index.ts", "src/lib/parsers/*.ts"]');
+      expect(JSON.parse(result!.files_touched)).toEqual(['src/cli/index.ts', 'src/lib/parsers/*.ts']);
       expect(result!.files_touched_fts).toBe('src/cli/index.ts src/lib/parsers/*.ts');
       expect(result!.short_summary).toBe('This is a test summary');
       expect(result!.body).toBe('Session body content here');

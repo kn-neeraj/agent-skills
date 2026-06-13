@@ -46,6 +46,11 @@ describe('database schema', () => {
       expect(result).toBeDefined();
     });
 
+    it('should create sessions_chunks table', () => {
+      const result = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='sessions_chunks'").get();
+      expect(result).toBeDefined();
+    });
+
     it('should enable foreign keys', () => {
       const result = db.pragma('foreign_keys', { simple: true });
       expect(result).toBe(1);
@@ -147,6 +152,33 @@ describe('database schema', () => {
 
       expect(searchResult).toHaveLength(1);
       expect(searchResult[0].title).toBe('FTS Test Session');
+    });
+  });
+
+  describe('sessions_chunks table schema', () => {
+    it('should accept chunk rows', () => {
+      db.prepare(`
+        INSERT INTO sessions
+        (slug, date, title, files_touched, files_touched_fts, short_summary, body, hash, indexed_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        'chunked-session',
+        '2026-06-13',
+        'Chunked Session',
+        '[]',
+        '',
+        'Summary',
+        'Body',
+        'hash',
+        new Date().toISOString()
+      );
+
+      const result = db.prepare(`
+        INSERT INTO sessions_chunks (id, slug, seq, text, hash)
+        VALUES (?, ?, ?, ?, ?)
+      `).run('chunked-session:0', 'chunked-session', 0, 'chunk text', 'chunk-hash');
+
+      expect(result.changes).toBe(1);
     });
   });
 });

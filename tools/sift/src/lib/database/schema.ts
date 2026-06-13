@@ -39,10 +39,30 @@ export function initializeDatabase(dbPath: string): Database.Database {
     )
   `);
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS sessions_chunks (
+      id TEXT PRIMARY KEY,
+      slug TEXT NOT NULL,
+      seq INTEGER NOT NULL,
+      text TEXT NOT NULL,
+      hash TEXT NOT NULL,
+      FOREIGN KEY (slug) REFERENCES sessions(slug) ON DELETE CASCADE
+    )
+  `);
+
   return db;
 }
 
 export function getDatabasePath(): string {
-  const dbDir = path.join(os.homedir(), '.sift');
+  const dbDir = path.join(process.env.HOME || os.homedir(), '.sift');
   return path.join(dbDir, 'index.sqlite');
+}
+
+export function createVectorTable(db: Database.Database, dims: number): void {
+  db.exec(`
+    CREATE VIRTUAL TABLE IF NOT EXISTS sessions_vec USING vec0(
+      chunk_id TEXT PRIMARY KEY,
+      embedding FLOAT[${dims}] distance_metric=cosine
+    )
+  `);
 }

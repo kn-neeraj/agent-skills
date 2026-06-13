@@ -1,14 +1,16 @@
 # sift CLI Tool
 
-A lightweight CLI tool for listing and filtering session summary files from `docs/sessions/`.
+A CLI tool for indexing, browsing, keyword-searching, and semantically searching session summary files from `docs/sessions/`.
 
-## ✅ Phase 1 Complete
+## ✅ Phase 3 Complete
 
-- ✅ `sift list` command with date filtering and JSON output
+- ✅ `sift list` for chronological browsing and JSON output
+- ✅ `sift index` for SQLite/FTS indexing
+- ✅ `sift embed` for local Ollama-based semantic embeddings
+- ✅ `sift search` hybrid retrieval via BM25 + vector search + RRF
+- ✅ `sift get` and `sift status` for inspection and health checks
 - ✅ Support for both frontmatter and legacy formats
-- ✅ Comprehensive test suite (77% coverage)
-- ✅ Global CLI installation via npm link
-- ✅ Graceful error handling
+- ✅ Graceful fallback to keyword-only search when embeddings are unavailable
 
 ## Installation
 
@@ -18,6 +20,12 @@ npm install
 npm run build
 npm link
 ```
+
+## Requirements
+
+- Node.js
+- Ollama running locally for semantic search
+- `embeddinggemma:latest` pulled in Ollama, or a compatible model configured in `~/.sift/config.yml`
 
 ## Usage
 
@@ -59,6 +67,31 @@ Output:
 ### Combine filters
 ```bash
 sift list --since 2026-06-01 --json
+```
+
+### Index sessions into SQLite
+```bash
+sift index
+```
+
+### Build or refresh embeddings
+```bash
+sift embed
+```
+
+### Force a full embedding rebuild
+```bash
+sift embed --force
+```
+
+### Hybrid search
+```bash
+sift search "opencode slash command"
+```
+
+### Inspect index and embedding health
+```bash
+sift status
 ```
 
 ## Development
@@ -104,8 +137,13 @@ Session content goes here...
 - **Dual format support**: Handles both YAML frontmatter and legacy title-line formats
 - **Date filtering**: Filter sessions by date using `--since` flag
 - **JSON output**: Machine-readable output for automation
+- **SQLite indexing**: Stores session metadata and bodies in `~/.sift/index.sqlite`
+- **Keyword search**: Uses SQLite FTS5 with BM25 ranking
+- **Semantic search**: Uses Ollama embeddings + `sqlite-vec` chunk retrieval
+- **Hybrid ranking**: Fuses BM25 and vector candidates with Reciprocal Rank Fusion
+- **Deterministic chunking**: Splits session bodies by headings/paragraphs with stable chunk IDs
 - **Error handling**: Graceful handling of missing fields, invalid dates, and file read errors
-- **Comprehensive tests**: 36 tests with 77% coverage
+- **Graceful fallback**: If embeddings are unavailable or stale, search falls back to keyword-only mode with a warning
 
 ## Error Handling
 
@@ -113,6 +151,8 @@ Session content goes here...
 - Missing fields: Warnings with default values
 - File read errors: Logged and skipped
 - Empty directory: Shows "No sessions found"
+- Embedding provider unavailable: warns and uses keyword search only
+- Model/config mismatch: warns and uses keyword search only until `sift embed --force`
 
 ## Project Structure
 
@@ -122,20 +162,26 @@ tools/sift/
 ├── src/
 │   ├── cli/              # CLI commands
 │   │   ├── index.ts      # Main CLI entry
-│   │   └── list-command.ts # List command implementation
+│   │   ├── list-command.ts
+│   │   ├── index-command.ts
+│   │   ├── embed-command.ts
+│   │   ├── search-command.ts
+│   │   ├── get-command.ts
+│   │   └── status-command.ts
 │   ├── lib/              # Core functionality
-│   │   ├── file-operations.ts  # File system operations
-│   │   ├── format-detector.ts  # Format detection
-│   │   ├── parsers/            # Session parsers
-│   │   │   ├── frontmatter-parser.ts
-│   │   │   └── legacy-parser.ts
-│   │   ├── filters/            # Data filters
-│   │   │   └── date-filter.ts
-│   │   └── formatters/         # Output formatters
-│   │       ├── console-formatter.ts
-│   │       └── json-formatter.ts
+│   │   ├── chunking.ts
+│   │   ├── config.ts
+│   │   ├── file-operations.ts
+│   │   ├── format-detector.ts
+│   │   ├── database/
+│   │   ├── embeddings/
+│   │   ├── parsers/
+│   │   ├── filters/
+│   │   ├── formatters/
+│   │   └── search/
 │   └── types/            # TypeScript types
-│       └── session.ts
+│       ├── session.ts
+│       └── embedding.ts
 ├── test/                 # Test files
 ├── dist/                 # Compiled JavaScript
 ├── package.json
@@ -143,12 +189,22 @@ tools/sift/
 └── README.md
 ```
 
-## Next Steps (Phase 2)
+## Semantic Search Config
 
-- SQLite database integration
-- BM25 full-text search
-- Additional filtering options
-- Session inspection command
+`sift` reads embeddings config from `~/.sift/config.yml`. If the file is missing, it uses defaults:
+
+```yaml
+embeddings:
+  provider: ollama
+  model: embeddinggemma:latest
+  url: http://localhost:11434
+```
+
+## Current Limitations
+
+- Legacy-format sessions still produce weaker semantic metadata than frontmatter sessions
+- Phase 3 only implements and tests Ollama, though the config shape leaves room for future providers
+- `sift index` and `sift embed` are still separate commands; automatic `/summarise` integration is a later step
 
 ## License
 
