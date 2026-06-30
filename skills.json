@@ -5,7 +5,7 @@
       "name": "build-slides",
       "description": "Generate presentation slides with structured formats, themes, and chart patterns",
       "trigger": "create slides, make presentation, build deck, generate slides, powerpoint, keynote",
-      "path": "./build-slides",
+      "path": "./skills/build-slides",
       "tags": ["presentation", "slides", "generation", "design"],
       "runtimes": {
         "claude_ai": true,
@@ -33,7 +33,7 @@
       "name": "read-sessions-summary",
       "description": "Read and browse session summaries from docs/sessions/ to restore context from previous sessions",
       "trigger": "read sessions, load context, catch up, where were we, previous sessions",
-      "path": "./read-sessions-summary",
+      "path": "./skills/read-sessions-summary",
       "tags": ["session", "memory", "context", "search"],
       "runtimes": {
         "claude_ai": true,
@@ -44,11 +44,11 @@
       "author": "agent-skills"
     },
     {
-      "name": "read-sessions-summary",
-      "description": "Read and browse session summaries from docs/sessions/ to restore context from previous sessions",
-      "trigger": "read sessions, load context, catch up, where were we, previous sessions",
-      "path": "./read-sessions-summary",
-      "tags": ["session", "memory", "context", "search"],
+      "name": "generate-whiteboard-diagram",
+      "description": "Generate clean monochrome whiteboard diagrams as SVG for explaining concepts, systems, and tradeoffs",
+      "trigger": "whiteboard diagram, simple diagram, black and white diagram, no-color diagram, sketch this, draw this out, explain with diagram",
+      "path": "./skills/generate-whiteboard-diagram",
+      "tags": ["diagram", "svg", "whiteboard", "visualization"],
       "runtimes": {
         "claude_ai": true,
         "claude_code": true,
