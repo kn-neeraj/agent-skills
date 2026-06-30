@@ -1,0 +1,11 @@
+{
+  "name": "generate-whiteboard-diagram",
+  "version": "1.0.0",
+  "description": "Generate monochrome whiteboard-style SVG diagrams for explaining technical, product, or business concepts",
+  "instructions": "Install from ./skills/generate-whiteboard-diagram/SKILL.md",
+  "metadata": {
+    "author": "agent-skills",
+    "tags": ["diagram", "svg", "whiteboard", "visualization"],
+    "runtime": ["claude.ai", "claude-code", "cowork"]
+  }
+}
